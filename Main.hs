@@ -11,7 +11,6 @@ import Data.Time
 import Numeric.Units.Dimensional.Prelude
 import Text.Printf(printf)
 
-
 main = do
   time <- getCurrentTime
   simulate $ addVessel $ mkSim $ toNearestSecond time
