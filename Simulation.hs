@@ -5,33 +5,9 @@ import Primitives
 import Time
 
 import qualified Prelude
-import Control.Concurrent (threadDelay)
 import Data.Time
 import Numeric.Units.Dimensional.Prelude
 import Text.Printf (printf)
-
-timeStep :: Time'
-timeStep = 10 *~ milli second
-
-forkSim :: IO Simulation
-forkSim = do
-  time <- getCurrentTime
-  let sim = addVessel $ mkSim $ toNearestSecond time
-  forkIO (simulate sim)
-  return sim
-
-simulate :: Simulation -> IO ()
-simulate s = do
-  s' <- advanceTo =<< getCurrentTime
-  threadDelay 1000
-  simulate s'
-  where newTimeFor = addTime timeStep
-        advanceTo t
-          | simTime s > newTimeFor t = return s
-          | otherwise = do
-              let s' = advanceSim timeStep s
-              putStrLn $ show s'
-              return s'
 
 data Simulation = Simulation {
   simTime :: UTCTime,
