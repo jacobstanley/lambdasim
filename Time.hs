@@ -4,6 +4,7 @@ import Primitives
 
 import Data.Time
 import Data.Ratio ((%))
+import Control.Monad (liftM)
 import Numeric.Units.Dimensional.Prelude
 
 addTime :: Time' -> UTCTime -> UTCTime
@@ -21,3 +22,6 @@ toNearestSecond utc = utc { utctDayTime = rounded }
   where rounded = secondsToDiffTime seconds
         seconds = round (toRational dayTime)
         dayTime = utctDayTime utc
+
+getRoundedTime :: IO UTCTime
+getRoundedTime = liftM toNearestSecond getCurrentTime
