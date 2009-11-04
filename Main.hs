@@ -1,89 +1,38 @@
 module Main where
 
-import Geographical
-import Primitives
+import Simulation
 import Time
 
-import qualified Prelude
-import Control.Concurrent (threadDelay)
-import Control.Monad (liftM)
 import Data.Time
-import Numeric.Units.Dimensional.Prelude
-import Text.Printf(printf)
+import Graphics.UI.Gtk
+import Graphics.UI.Gtk.Glade
+import Control.Monad (liftM)
+import Control.Concurrent
 
+--main = do
+--  time <- getCurrentTime
+--  simulate $ addVessel $ mkSim $ toNearestSecond time
+
+main :: IO ()
 main = do
-  time <- getCurrentTime
-  simulate $ addVessel $ mkSim $ toNearestSecond time
+  unsafeInitGUIForThreadedRTS
+  timeoutAddFull (yield >> return True) priorityDefaultIdle 100
 
-timeStep :: Time'
-timeStep = 10 *~ milli second
+  Just xml <- xmlNew "main.glade"
 
-simulate :: Simulation -> IO ()
-simulate s = do
-  s' <- advanceTo =<< getCurrentTime
-  threadDelay 1000
-  simulate s'
-  where newTimeFor = addTime timeStep
-        advanceTo t
-          | simTime s > newTimeFor t = return s
-          | otherwise = do
-              let s' = advanceSim timeStep s
-              putStrLn $ show s'
-              return s'
+  window <- xmlGetWidget xml castToWindow "window"
+  onDestroy window mainQuit
 
-data Simulation = Simulation {
-  simTime :: UTCTime,
-  simVessels :: [Vessel]
-}
+  heading <- xmlGetWidget xml castToHScale "heading"
+  rudder  <- xmlGetWidget xml castToHScale "rudder"
+  speed   <- xmlGetWidget xml castToHScale "speed"
 
-instance Show Simulation where
-  show s = printf "Simulation\n\
-                  \  Time: %s\n\
-                  \  Vessels: %s" t v
-    where t = show (simTime s)
-          v = show (simVessels s)
+  sim <- forkSim
 
-mkSim :: UTCTime -> Simulation
-mkSim utc = Simulation {
-  simTime = utc,
-  simVessels = []
-}
+  onRangeValueChanged heading $ do
+    value <- rangeGetValue heading
+    putStrLn $ "Heading: " ++ (show value)
 
-addVessel :: Simulation -> Simulation
-addVessel s = s { simVessels = mkVessel : (simVessels s) }
+  widgetShowAll window
+  mainGUI
 
-advanceSim :: Time' -> Simulation -> Simulation
-advanceSim t s =
-  s { simTime = addTime t (simTime s),
-      simVessels = map (advanceVessel t) (simVessels s) }
-
-
-data Vessel = Vessel {
-  vesPosition :: Geog,
-  vesHeading :: Angle',
-  vesRudder :: AngularVelocity',
-  vesSpeed :: Velocity'
-}
-
-instance Show Vessel where
-  show v = printf "Vessel Pos: %s Hdg: %.2f deg" p h
-    where h = (vesHeading v) /~ degree
-          p = show (vesPosition v)
-
-mkVessel :: Vessel
-mkVessel = Vessel {
-  vesPosition = mkGeog 32 116,
-  vesHeading = 0 *~ degree,
-  vesRudder  = 20 *~ (degree / second),
-  vesSpeed   = 50 *~ knot
-}
-
-advanceVessel :: Time' -> Vessel -> Vessel
-advanceVessel t v = v {
-  vesPosition = translate dst hdg pos,
-  vesHeading = hdg + (rdr * t)
-} where pos = vesPosition v
-        hdg = vesHeading v
-        rdr = vesRudder v
-        spd = vesSpeed v
-        dst = spd * t
