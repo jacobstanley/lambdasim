@@ -54,10 +54,10 @@ mkSim utc = Simulation {
 addVessel :: Simulation -> Simulation
 addVessel s = s { simVessels = mkVessel : (simVessels s) }
 
-advanceSim :: Time' -> Simulation -> Simulation
-advanceSim t s =
+advanceSimBy :: Time' -> Simulation -> Simulation
+advanceSimBy t s =
   s { simTime = addTime t (simTime s),
-      simVessels = map (advanceVessel t) (simVessels s) }
+      simVessels = map (advanceVesselBy t) (simVessels s) }
 
 
 data Vessel = Vessel {
@@ -80,8 +80,8 @@ mkVessel = Vessel {
   vesSpeed   = 5 *~ knot
 }
 
-advanceVessel :: Time' -> Vessel -> Vessel
-advanceVessel t v = v {
+advanceVesselBy :: Time' -> Vessel -> Vessel
+advanceVesselBy t v = v {
   vesPosition = translate dst hdg pos,
   vesHeading = hdg + (rdr * t)
 } where pos = vesPosition v
