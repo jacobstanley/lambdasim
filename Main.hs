@@ -1,20 +1,23 @@
 module Main where
 
+import Gtk
 import Primitives
 import Simulation
+import STM
 import Time
 
 import Data.Time
 import Graphics.UI.Gtk
 import Graphics.UI.Gtk.Glade
-import Control.Monad (liftM)
+import Control.Monad
+import Control.Applicative ((<$>))
 import Control.Concurrent
 import Control.Concurrent.STM
 import Numeric.Units.Dimensional.Prelude
 
 main :: IO ()
 main = do
-  unsafeInitGUIForThreadedRTS
+  initGUI
   timeoutAddFull (yield >> return True) priorityDefaultIdle 100
 
   Just xml <- xmlNew "main.glade"
@@ -22,43 +25,47 @@ main = do
   window <- xmlGetWidget xml castToWindow "window"
   onDestroy window mainQuit
 
-  heading <- xmlGetWidget xml castToHScale "heading"
-  rudder  <- xmlGetWidget xml castToHScale "rudder"
-  speed   <- xmlGetWidget xml castToHScale "speed"
+  headingScale <- xmlGetWidget xml castToHScale "heading"
+  rudderScale  <- xmlGetWidget xml castToHScale "rudder"
+  speedScale   <- xmlGetWidget xml castToHScale "speed"
 
   sim <- startSimulation
 
-  onRangeValueChanged heading $ do
-    value <- rangeGetValue heading
-    putStrLn $ "Heading: " ++ (show value)
+  onRangeValueChanged headingScale $ do
+    heading <- rangeGetValue headingScale
+    stmApply (setHeading (heading *~ degree)) sim
+
+  onInterval 25 $ do
+    vessel <- head <$> simVessels <$> (stmRead sim)
+    let heading = vesHeading vessel
+    rangeSetValue headingScale (heading /~ degree)
 
   widgetShowAll window
   mainGUI
 
-timeStep :: Time'
-timeStep = 10 *~ milli second
+setHeading :: Angle' -> Simulation -> Simulation
+setHeading h = updateFirstVessel update
+  where update v = v { vesHeading = h }
 
 startSimulation :: IO (TVar Simulation)
 startSimulation = do
   time <- getRoundedTime
-  sim <- atomically $ newTVar $ addVessel (mkSim time)
+  sim <- stmNew $ addVessel (newSimulation time)
   forkIO (simulate sim)
   forkIO (monitor sim)
   return sim
 
 simulate :: TVar Simulation -> IO ()
-simulate sim = do
+simulate sim = forever $ do
   t <- getCurrentTime
-  atomicApply (advanceTo t) sim
+  stmApply (advanceTo t) sim
   sleep (10 *~ milli second)
-  simulate sim
 
 monitor :: TVar Simulation -> IO ()
-monitor sim = do
-  s <- atomicRead sim
+monitor sim = forever $ do
+  s <- stmRead sim
   putStrLn (show s)
   sleep (1 *~ second)
-  monitor sim
 
 sleep :: Time' -> IO ()
 sleep t = threadDelay us
@@ -67,6 +74,9 @@ sleep t = threadDelay us
 advanceTo :: UTCTime -> Simulation -> Simulation
 advanceTo t s
   | currentTime > step t = s
-  | otherwise = advanceSimBy timeStep s
+  | otherwise = advanceBy timeStep s
   where step = addTime timeStep
         currentTime = simTime s
+
+timeStep :: Time'
+timeStep = 10 *~ milli second
