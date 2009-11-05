@@ -64,18 +64,6 @@ sleep :: Time' -> IO ()
 sleep t = threadDelay us
   where us = round (t /~ micro second)
 
-atomicApply :: (a -> a) -> TVar a -> IO ()
-atomicApply f x = atomically $ readTVar x >>= writeTVar x . f
-
-atomicUpdate :: (a -> a) -> TVar a -> IO a
-atomicUpdate f x = atomically $ do
-  tx <- readTVar x
-  writeTVar x (f tx)
-  return tx
-
-atomicRead :: TVar a -> IO a
-atomicRead x = atomically $ readTVar x
-
 advanceTo :: UTCTime -> Simulation -> Simulation
 advanceTo t s
   | currentTime > step t = s
