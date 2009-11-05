@@ -9,6 +9,9 @@ import Data.Time
 import Numeric.Units.Dimensional.Prelude
 import Text.Printf (printf)
 
+class AdvanceTime a where
+  advanceBy :: Time' -> a -> a
+
 data Simulation = Simulation {
   simTime :: UTCTime,
   simVessels :: [Vessel]
@@ -21,20 +24,27 @@ instance Show Simulation where
     where t = show (simTime s)
           v = show (simVessels s)
 
-mkSim :: UTCTime -> Simulation
-mkSim utc = Simulation {
+instance AdvanceTime Simulation where
+  advanceBy t s =
+    s { simTime = addTime t (simTime s),
+        simVessels = map (advanceBy t) (simVessels s) }
+
+newSimulation :: UTCTime -> Simulation
+newSimulation utc = Simulation {
   simTime = utc,
   simVessels = []
 }
 
 addVessel :: Simulation -> Simulation
-addVessel s = s { simVessels = mkVessel : (simVessels s) }
+addVessel = updateVessels (\vs -> newVessel : vs)
 
-advanceSimBy :: Time' -> Simulation -> Simulation
-advanceSimBy t s =
-  s { simTime = addTime t (simTime s),
-      simVessels = map (advanceVesselBy t) (simVessels s) }
+updateVessels :: ([Vessel] -> [Vessel]) -> Simulation -> Simulation
+updateVessels f s = s { simVessels = f (simVessels s) }
 
+updateFirstVessel :: (Vessel -> Vessel) -> Simulation -> Simulation
+updateFirstVessel f = updateVessels update
+  where update [] = []
+        update (v:vs) = f v : vs
 
 data Vessel = Vessel {
   vesPosition :: Geog,
@@ -48,20 +58,20 @@ instance Show Vessel where
     where h = (vesHeading v) /~ degree
           p = show (vesPosition v)
 
-mkVessel :: Vessel
-mkVessel = Vessel {
+instance AdvanceTime Vessel where
+  advanceBy t v =
+    v { vesPosition = translate dst hdg pos,
+        vesHeading = hdg + (rdr * t) }
+    where pos = vesPosition v
+          hdg = vesHeading v
+          rdr = vesRudder v
+          spd = vesSpeed v
+          dst = spd * t
+
+newVessel :: Vessel
+newVessel = Vessel {
   vesPosition = mkGeog 32 116,
   vesHeading = 0 *~ degree,
   vesRudder  = 2 *~ (degree / second),
   vesSpeed   = 5 *~ knot
 }
-
-advanceVesselBy :: Time' -> Vessel -> Vessel
-advanceVesselBy t v = v {
-  vesPosition = translate dst hdg pos,
-  vesHeading = hdg + (rdr * t)
-} where pos = vesPosition v
-        hdg = vesHeading v
-        rdr = vesRudder v
-        spd = vesSpeed v
-        dst = spd * t
