@@ -13,11 +13,13 @@ import Control.Monad
 import Control.Applicative ((<$>))
 import Control.Concurrent
 import Control.Concurrent.STM
+import Text.Printf(printf)
 import Numeric.Units.Dimensional.Prelude
+import qualified Prelude
 
 main :: IO ()
 main = do
-  initGUI
+  unsafeInitGUIForThreadedRTS
   timeoutAddFull (yield >> return True) priorityDefaultIdle 100
 
   Just xml <- xmlNew "main.glade"
@@ -35,31 +37,41 @@ main = do
     heading <- rangeGetValue headingScale
     stmApply (setHeading (heading *~ degree)) sim
 
-  onInterval 25 $ do
+  onRangeValueChanged rudderScale $ do
+    rudder <- rangeGetValue rudderScale
+    stmApply (setRudder (rudder *~ (degree / second))) sim
+
+  onInterval 100 $ do
     vessel <- head <$> simVessels <$> (stmRead sim)
-    let heading = vesHeading vessel
-    rangeSetValue headingScale (heading /~ degree)
+    rangeSetValue headingScale $ (vesHeading vessel) /~ degree
+    rangeSetValue rudderScale $ (vesRudder vessel) /~ (degree / second)
+    rangeSetValue speedScale $ (vesSpeed vessel) /~ knot
+    mapM_ widgetQueueDraw [headingScale, rudderScale, speedScale]
 
   widgetShowAll window
   mainGUI
 
 setHeading :: Angle' -> Simulation -> Simulation
-setHeading h = updateFirstVessel update
-  where update v = v { vesHeading = h }
+setHeading x = updateFirstVessel (\v -> v { vesHeading = x })
+
+setRudder :: AngularVelocity' -> Simulation -> Simulation
+setRudder x = updateFirstVessel (\v -> v { vesRudder = x })
+
+setSpeed :: Velocity' -> Simulation -> Simulation
+setSpeed x = updateFirstVessel (\v -> v { vesSpeed = x })
 
 startSimulation :: IO (TVar Simulation)
 startSimulation = do
   time <- getRoundedTime
   sim <- stmNew $ addVessel (newSimulation time)
   forkIO (simulate sim)
-  forkIO (monitor sim)
   return sim
 
 simulate :: TVar Simulation -> IO ()
 simulate sim = forever $ do
   t <- getCurrentTime
   stmApply (advanceTo t) sim
-  sleep (10 *~ milli second)
+  sleep (1 *~ milli second)
 
 monitor :: TVar Simulation -> IO ()
 monitor sim = forever $ do
