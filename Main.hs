@@ -22,7 +22,7 @@ main = do
   unsafeInitGUIForThreadedRTS
   timeoutAddFull (yield >> return True) priorityDefaultIdle 100
 
-  Just xml <- xmlNew "main.glade"
+  Just xml <- xmlNew "lambdasim.glade"
 
   window <- xmlGetWidget xml castToWindow "window"
   onDestroy window mainQuit
@@ -85,10 +85,11 @@ sleep t = threadDelay us
 
 advanceTo :: UTCTime -> Simulation -> Simulation
 advanceTo t s
-  | currentTime > step t = s
+  | isLater   = s
   | otherwise = advanceBy timeStep s
-  where step = addTime timeStep
+  where isLater = currentTime > proposedTime
         currentTime = simTime s
+        proposedTime = addTime timeStep t
 
 timeStep :: Time'
-timeStep = 10 *~ milli second
+timeStep = 5 *~ milli second

@@ -6,10 +6,12 @@ stmNew :: a -> IO (TVar a)
 stmNew x = atomically (newTVar x)
 
 stmRead :: TVar a -> IO a
-stmRead x = atomically (readTVar x)
+stmRead tx = atomically (readTVar tx)
 
 stmApply :: (a -> a) -> TVar a -> IO ()
-stmApply f x = atomically (readTVar x >>= writeTVar x . f)
+stmApply f tx = atomically $ do
+  x <- readTVar tx
+  writeTVar tx (f x)
 
 stmUpdate :: (a -> a) -> TVar a -> IO a
 stmUpdate f tx = atomically $ do
