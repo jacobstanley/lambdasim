@@ -1,0 +1,3 @@
+#!/bin/sh
+ghc -fforce-recomp --make -O2 Main.hs -o lambdasim -outputdir obj
+ghc -fforce-recomp --make -O2 Main.hs -o lambdasim -outputdir obj -osuf p_o -prof -auto-all -caf-all 
