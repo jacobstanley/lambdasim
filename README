@@ -1,0 +1,14 @@
+PROFILING
+
+To do memory profiling run:
+
+ghc -fforce-recomp --make -O2 Main.hs -o lambdasim -outputdir obj
+ghc -fforce-recomp --make -O2 Main.hs -o lambdasim -outputdir obj -osuf p_o -prof -auto-all -caf-all 
+
+then:
+
+./lambdasim +RTS -hc -p -i0.001 -L100
+
+then:
+
+hp2ps -e8in -c *.hp
