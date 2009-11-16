@@ -1,2 +1,9 @@
+*.hp
+*.aux
+*.prof
+*.ps
+*.hi
+*.o
+*.p_o
 *.swp
 nmea.html
