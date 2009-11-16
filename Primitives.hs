@@ -1,6 +1,8 @@
 module Primitives where
 
 import qualified Prelude
+import Control.Parallel.Strategies
+import Numeric.Units.Dimensional
 import Numeric.Units.Dimensional.Prelude
 import Numeric.Units.Dimensional.NonSI (nauticalMile)
 
@@ -12,3 +14,6 @@ type Velocity'        = Velocity Double
 
 knot :: Fractional a => Unit DVelocity a
 knot = nauticalMile / hour
+
+instance NFData a => NFData (Dimensional v d a) where
+  rnf (Dimensional x) = rnf x
