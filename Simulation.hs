@@ -1,3 +1,5 @@
+{-# LANGUAGE TemplateHaskell #-}
+
 module Simulation where
 
 import Geographical
@@ -6,8 +8,11 @@ import Time
 
 import qualified Prelude
 import Data.Time
-import Numeric.Units.Dimensional.Prelude
+import Data.DeriveTH
+import Data.Derive.NFData
 import Text.Printf (printf)
+import Control.Parallel.Strategies
+import Numeric.Units.Dimensional.Prelude
 
 class AdvanceTime a where
   advanceBy :: Time' -> a -> a
@@ -75,3 +80,6 @@ newVessel = Vessel {
   vesRudder  = 2 *~ (degree / second),
   vesSpeed   = 5 *~ knot
 }
+
+$(derive makeNFData ''Vessel)
+$(derive makeNFData ''Simulation)
