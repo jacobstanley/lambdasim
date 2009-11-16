@@ -11,11 +11,11 @@ stmRead tx = atomically (readTVar tx)
 stmApply :: (a -> a) -> TVar a -> IO ()
 stmApply f tx = atomically $ do
   x <- readTVar tx
-  writeTVar tx (f x)
+  writeTVar tx $! (f x)
 
 stmUpdate :: (a -> a) -> TVar a -> IO a
 stmUpdate f tx = atomically $ do
   x <- readTVar tx
   let x' = f x
-  writeTVar tx (f x)
+  writeTVar tx $! x'
   return x'
