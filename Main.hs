@@ -13,6 +13,7 @@ import Control.Monad
 import Control.Applicative ((<$>))
 import Control.Concurrent
 import Control.Concurrent.STM
+import Control.Parallel.Strategies
 import Text.Printf(printf)
 import Numeric.Units.Dimensional.Prelude
 import qualified Prelude
@@ -86,10 +87,11 @@ sleep t = threadDelay us
 advanceTo :: UTCTime -> Simulation -> Simulation
 advanceTo t s
   | isLater   = s
-  | otherwise = advanceBy timeStep s
+  | otherwise = rnf s' `seq` s'
   where isLater = currentTime > proposedTime
         currentTime = simTime s
         proposedTime = addTime timeStep t
+        s' = advanceBy timeStep s
 
 timeStep :: Time'
 timeStep = 5 *~ milli second
