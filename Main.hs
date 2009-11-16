@@ -42,6 +42,10 @@ main = do
     rudder <- rangeGetValue rudderScale
     stmApply (setRudder (rudder *~ (degree / second))) sim
 
+  onRangeValueChanged speedScale $ do
+    speed <- rangeGetValue speedScale
+    stmApply (setSpeed (speed *~ knot)) sim
+
   onInterval 100 $ do
     vessel <- head <$> simVessels <$> (stmRead sim)
     rangeSetValue headingScale $ (vesHeading vessel) /~ degree
