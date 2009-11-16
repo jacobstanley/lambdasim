@@ -1,15 +1,17 @@
+module UdpSender where
+
 import Network.Socket hiding (listen)
 import Data.List (genericDrop)
 import System.IO (hFlush,stdout)
 
 type HandlerFunc = SockAddr -> String -> IO ()
 
-main = do
+testUdp = do
   putStr "> "
   hFlush stdout
   msg <- getLine
   sendMsg "127.0.0.1" "2000" msg
-  main
+  testUdp
 
 sendMsg :: String -> String -> String -> IO ()
 sendMsg hostname port msg = withSocketsDo $ do

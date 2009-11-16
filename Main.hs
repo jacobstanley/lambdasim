@@ -5,6 +5,7 @@ import Primitives
 import Simulation
 import STM
 import Time
+import UdpSender
 
 import Data.Time
 import Graphics.UI.Gtk
@@ -82,6 +83,12 @@ monitor :: TVar Simulation -> IO ()
 monitor sim = forever $ do
   s <- stmRead sim
   putStrLn (show s)
+  sleep (1 *~ second)
+
+monitorUdp :: TVar Simulation -> IO ()
+monitorUdp sim = forever $ do
+  s <- stmRead sim
+  sendMsg "127.0.0.1" "2000" (show s)
   sleep (1 *~ second)
 
 sleep :: Time' -> IO ()
