@@ -5,6 +5,7 @@ import Primitives
 import Data.Time
 import Data.Ratio ((%))
 import Control.Monad (liftM)
+import Control.Parallel.Strategies
 import Numeric.Units.Dimensional.Prelude
 
 addTime :: Time' -> UTCTime -> UTCTime
@@ -25,3 +26,6 @@ toNearestSecond utc = utc { utctDayTime = rounded }
 
 getRoundedTime :: IO UTCTime
 getRoundedTime = liftM toNearestSecond getCurrentTime
+
+instance NFData UTCTime where
+  rnf x = (utctDay x) `seq` (utctDayTime x) `seq` ()
