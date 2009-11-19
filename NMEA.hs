@@ -19,7 +19,7 @@ import Prelude hiding ((-),(+),abs)
 data FixQuality
   = Invalid | GPS | DGPS | PPS  | RTK | FloatRTK
   | DeadReckoning | Manual | Simulation
-  deriving (Prelude.Enum, Prelude.Show)
+  deriving (Enum, Show)
 
 type Satellites = Int
 type HDOP = Double
