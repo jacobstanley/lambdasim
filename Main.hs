@@ -1,6 +1,7 @@
 module Main where
 
 import Gtk
+import NMEA
 import Primitives
 import Simulation
 import STM
@@ -17,7 +18,7 @@ import Control.Concurrent.STM
 import Control.Parallel.Strategies
 import Text.Printf(printf)
 import Numeric.Units.Dimensional.Prelude
-import qualified Prelude
+import Prelude hiding ((/))
 
 main :: IO ()
 main = do
@@ -71,6 +72,7 @@ startSimulation = do
   time <- getRoundedTime
   sim <- stmNew $ addVessel (newSimulation time)
   forkIO (simulate sim)
+  forkIO (monitorUdp sim)
   return sim
 
 simulate :: TVar Simulation -> IO ()
@@ -88,8 +90,13 @@ monitor sim = forever $ do
 monitorUdp :: TVar Simulation -> IO ()
 monitorUdp sim = forever $ do
   s <- stmRead sim
-  sendMsg "127.0.0.1" "2000" (show s)
+  sendMsg "127.0.0.1" "2000" (toNMEA s)
   sleep (1 *~ second)
+
+toNMEA :: Simulation -> String
+toNMEA sim = gga utc pos GPS
+  where utc = simTime sim
+        pos = vesPosition $ head $ simVessels sim
 
 sleep :: Time' -> IO ()
 sleep t = threadDelay us

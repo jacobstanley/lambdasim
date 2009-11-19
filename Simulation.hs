@@ -6,13 +6,13 @@ import Geographical
 import Primitives
 import Time
 
-import qualified Prelude
 import Data.Time
 import Data.DeriveTH
 import Data.Derive.NFData
 import Text.Printf (printf)
 import Control.Parallel.Strategies
 import Numeric.Units.Dimensional.Prelude
+import Prelude hiding ((+),(*),(/))
 
 class AdvanceTime a where
   advanceBy :: Time' -> a -> a
@@ -75,7 +75,7 @@ instance AdvanceTime Vessel where
 
 newVessel :: Vessel
 newVessel = Vessel {
-  vesPosition = mkGeog 32 116,
+  vesPosition = mkGeog2 (-32) 116,
   vesHeading = 0 *~ degree,
   vesRudder  = 2 *~ (degree / second),
   vesSpeed   = 5 *~ knot

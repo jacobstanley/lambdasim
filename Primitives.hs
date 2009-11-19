@@ -1,10 +1,10 @@
 module Primitives where
 
-import qualified Prelude
 import Control.Parallel.Strategies
 import Numeric.Units.Dimensional
 import Numeric.Units.Dimensional.Prelude
 import Numeric.Units.Dimensional.NonSI (nauticalMile)
+import Prelude hiding ((/))
 
 type Angle'           = Angle Double
 type AngularVelocity' = AngularVelocity Double

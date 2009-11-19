@@ -18,11 +18,13 @@ instance Show Geog where
           latDegrees = lat /~ degree
           lonDegrees = lon /~ degree
 
-mkGeog :: Double -> Double -> Geog
-mkGeog lat lon =
-  Geog (lat *~ degree)
-       (lon *~ degree)
-       (0 *~ metre)
+mkGeog2 :: Double -> Double -> Geog
+mkGeog2 lat lon = mkGeog3 lat lon 0
+
+mkGeog3 :: Double -> Double -> Double -> Geog
+mkGeog3 lat lon elh = Geog (lat *~ degree)
+                           (lon *~ degree)
+                           (elh *~ metre)
 
 earthRadius :: Length'
 earthRadius = 6378137 *~ meter
