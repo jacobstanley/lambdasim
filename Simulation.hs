@@ -75,7 +75,7 @@ instance AdvanceTime Vessel where
 
 newVessel :: Vessel
 newVessel = Vessel {
-  vesPosition = mkGeog2 (-32) 116,
+  vesPosition = mkGeog (-32) 116 0,
   vesHeading = 0 *~ degree,
   vesRudder  = 2 *~ (degree / second),
   vesSpeed   = 5 *~ knot
