@@ -1,3 +1,7 @@
+/dist/
+/static/Build/
+
+.DS_Store
 *.hp
 *.aux
 *.prof
@@ -8,3 +12,5 @@
 *.swp
 nmea.html
 lambdasim
+/access.log
+/error.log
