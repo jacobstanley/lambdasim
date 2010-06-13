@@ -73,7 +73,7 @@
     [contentView addSubview:speedStartLabel];
     [contentView addSubview:speedEndLabel];
 
-    var request = [CPURLRequest requestWithURL:"vessel/speed"];
+    var request = [CPURLRequest requestWithURL:"vessel"];
     [CPURLConnection connectionWithRequest:request delegate:self];
 
     [theWindow orderFront:self];
@@ -90,7 +90,7 @@
 - (void)connection:(CPURLConnection)connection didReceiveData:(CPString)data
 {
     var result = JSON.parse(data)
-    [title setStringValue:result.eText]
+    [speed setDoubleValue:result.simSpeed]
 }
 
 - (void)connection:(CPURLConnection)connection didFailWithError:(CPString)error
