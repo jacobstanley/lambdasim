@@ -4,6 +4,8 @@
 
 @implementation AppController : CPObject
 {
+    CPTextField title;
+
     CPSlider speed;
     CPSlider heading;
     CPSlider rudder;
@@ -17,7 +19,7 @@
 
     var contentView = [theWindow contentView];
 
-    // Title
+    // title
 
     title = [[CPTextField alloc]
         initWithFrame:CGRectMakeZero()];
@@ -32,7 +34,7 @@
 
     [contentView addSubview:title];
 
-    // Sliders
+    // speed slider
 
     sliderWidth = 175;
     sliderHeight = 20;
@@ -42,15 +44,16 @@
     speed = [[CPSlider alloc]
         initWithFrame:CGRectMake(x0, y0, sliderWidth, sliderHeight)];
 
-    /*
     [speed setTarget:self];
-    [speed setAction:@selector(adjustSpeed:)];*/
+    [speed setAction:@selector(speedChanged:)];
     [speed setMinValue:-5];
     [speed setMaxValue:20];
     [speed setDoubleValue:0];
     [speed keepCentered];
 
     [contentView addSubview:speed];
+
+    // speed slider labels
 
     var speedLabel = [self labelWithTitle:"Speed (knots)"],
         speedStartLabel = [self labelWithTitle:"-5"],
@@ -70,7 +73,29 @@
     [contentView addSubview:speedStartLabel];
     [contentView addSubview:speedEndLabel];
 
+    var request = [CPURLRequest requestWithURL:"vessel/speed"];
+    [CPURLConnection connectionWithRequest:request delegate:self];
+
     [theWindow orderFront:self];
+}
+
+- (void)speedChanged:(id)sender
+{
+    var request = [CPURLRequest requestWithURL:
+        "vessel/speed/" + [speed doubleValue]]
+    [request setHTTPMethod:"PUT"]
+    [CPURLConnection connectionWithRequest:request delegate:nil];
+}
+
+- (void)connection:(CPURLConnection)connection didReceiveData:(CPString)data
+{
+    var result = JSON.parse(data)
+    [title setStringValue:result.eText]
+}
+
+- (void)connection:(CPURLConnection)connection didFailWithError:(CPString)error
+{
+    [label setStringValue:error]
 }
 
 - (CPTextField)labelWithTitle:(CPString)aTitle
@@ -84,15 +109,5 @@
 
     return label;
 }
-
-/*
-- (void)swap:(id)sender
-{
-    if ([title stringValue] == @"Hello Lambdaλsim!")
-        [title setStringValue:"Goodbye!"];
-    else
-        [title setStringValue:@"Hello Lambdaλsim!"];
-}
-*/
 
 @end

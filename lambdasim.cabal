@@ -24,15 +24,14 @@ Executable lambdasim
 
   build-depends:
     base == 4.*,
+    bytestring,
+    bytestring-lexing == 0.2.*,
     filepath,
     haskell98,
-    monads-fd >= 0.1 && <0.2,
-    bytestring,
-    snap-core >= 0.2 && <0.3,
-    snap-server >= 0.2 && <0.3,
-    heist,
-    hexpat,
-    time
+    json,
+    monads-fd == 0.1.*,
+    snap-core == 0.2.*,
+    snap-server == 0.2.*
 
   ghc-options: -O2 -Wall -fwarn-tabs -funbox-strict-fields -threaded -fno-warn-unused-imports
 
