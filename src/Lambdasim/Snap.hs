@@ -1,22 +1,30 @@
+{-# LANGUAGE DeriveDataTypeable #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE PackageImports #-}
+{-# LANGUAGE ScopedTypeVariables #-}
 
 module Lambdasim.Snap where
 
-import Control.Applicative
-import "monads-fd" Control.Monad.Trans
-import Data.ByteString.Char8 (ByteString)
-import Data.ByteString.Lex.Double (readDouble)
-import Data.Data
-import Snap.Types
-import Text.JSON.Generic
-
+import           Control.Applicative
+import           Control.Exception (SomeException)
+import           Control.Monad.CatchIO
+import"monads-fd"Control.Monad.Trans
+import           Data.ByteString.Char8 (ByteString)
 import qualified Data.ByteString.Char8 as B
+import           Data.ByteString.Lex.Double (readDouble)
+import           Data.Data
+import qualified Data.Text as T
+import           Prelude hiding (catch)
+import           Snap.Types
+import           Text.JSON.Generic
+import qualified Text.XHtmlCombinators.Escape as XH
+
 
 writeJSON :: (Data a) => a -> Snap ()
 writeJSON json = do
     writeBS $ B.pack $ encodeJSON json
     modifyResponse $ setContentType "application/json"
+
 
 param :: ByteString -> Snap ByteString
 param = paramMap Just
@@ -26,19 +34,36 @@ paramDouble = paramMap $ (fst <$>) . readDouble
 
 paramMap :: (ByteString -> Maybe a) -> ByteString -> Snap a
 paramMap f name = getParam name >>= \mstr -> case mstr of
-    Nothing  -> snapError ["parameter '", name, "' does not exist"]
+    Nothing  -> throwEx ["parameter '", name, "' does not exist"]
     Just str -> case f str of
-        Nothing  -> snapError ["'", str, "' is not a valid value for ",
-                               "parameter '", name, "'"]
+        Nothing  -> throwEx ["'", str, "' is not a valid value for ",
+                             "parameter '", name, "'"]
         Just val -> return val
+  where
+    throwEx xs = throw $ ParamException $ B.unpack $ B.concat xs
 
-snapError :: [ByteString] -> Snap a
-snapError msg = do
-    putResponse $ setResponseStatus 500 "Internal Server Error" emptyResponse
-    let fullMsg = B.concat $ "Error: " : msg
-    writeBS fullMsg
-    logError fullMsg
-    liftIO $ B.putStrLn fullMsg
-    r <- getResponse
-    finishWith r
-    empty
+
+data ParamException = ParamException String
+    deriving (Typeable)
+
+instance Exception ParamException
+
+instance Show ParamException where
+    show (ParamException msg) = "ParamException: " ++ msg
+
+
+catch500 :: Snap a -> Snap ()
+catch500 m = (m >> return ()) `catch` \(e::SomeException) -> do
+    let t = T.pack $ show e
+    putResponse r
+    writeBS "<html><head><title>Internal Server Error</title></head>"
+    writeBS "<body><h1>Internal Server Error</h1>"
+    writeBS "<p>A web handler threw an exception. Details:</p>"
+    writeBS "<pre>\n"
+    writeText $ XH.escape t
+    writeBS "\n</pre></body></html>"
+
+    logError $ B.append "Error: " $ B.pack $ show e
+  where
+    r = setContentType "text/html" $
+        setResponseStatus 500 "Internal Server Error" emptyResponse
