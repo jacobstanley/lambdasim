@@ -13,6 +13,10 @@ Category:            Web
 Build-type:          Simple
 Cabal-version:       >=1.2
 
+Flag deps
+  default: False
+  description: Use 'cabal install -fdeps' to install lambdasim's dependencies.
+
 Executable lambdasim
   hs-source-dirs: src
   main-is: Main.hs
@@ -30,3 +34,6 @@ Executable lambdasim
     time
 
   ghc-options: -O2 -Wall -fwarn-tabs -funbox-strict-fields -threaded -fno-warn-unused-imports
+
+  if flag(deps)
+    buildable: False
