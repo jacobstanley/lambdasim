@@ -1,17 +1,18 @@
-Name:                lambdasim
-Version:             0.1
-Synopsis:            Lambdaλsim: Simple Vessel Simulator 
+Name:            lambdasim
+Version:         0.1
+Synopsis:        Lambdaλsim: Simple Vessel Simulator 
 
 Description:
   Simulates sensor output for a vessel for testing navigation software.
 
-License:             BSD3
-Author:              Jacob Stanley
-Maintainer:          jystic@jystic.com
-Stability:           Experimental
-Category:            Web
-Build-type:          Simple
-Cabal-version:       >=1.2
+License:         BSD3
+License-file:    LICENSE
+Author:          Jacob Stanley
+Maintainer:      jystic@jystic.com
+Stability:       Experimental
+Category:        Web
+Build-type:      Simple
+Cabal-version:   >= 1.6
 
 Flag deps
   default: False
@@ -22,7 +23,7 @@ Executable lambdasim
   main-is: Main.hs
 
   build-depends:
-    base >= 4,
+    base == 4.*,
     filepath,
     haskell98,
     monads-fd >= 0.1 && <0.2,
