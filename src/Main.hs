@@ -55,6 +55,7 @@ putSpeed :: MVar SimState -> Snap ()
 putSpeed sim = do
     speed <- paramDouble "speed"
     liftIO $ modifyMVar_ sim $ \x -> return x { simSpeed = speed }
+    modifyResponse $ setContentType "application/json"
 
 getSim :: MVar SimState -> Snap ()
 getSim sim = do
