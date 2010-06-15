@@ -23,12 +23,12 @@ import           Lambdasim.Snap
 main :: IO ()
 main = do
     port <- liftM parseArgs getArgs
-    st <- newMVar $ SimState 0
+    sim <- newMVar $ SimState 0
     putStrLn $ "Starting Lambdaλsim on port " ++ show port
     httpServe "*" port "hostname"
         (Just "access.log")
         (Just "error.log")
-        (site $ st)
+        (site sim)
 
 type Port = Int
 
