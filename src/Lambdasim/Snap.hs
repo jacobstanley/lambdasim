@@ -26,6 +26,24 @@ writeJSON json = do
     modifyResponse $ setContentType "application/json"
 
 
+type MethodRoute = ByteString -> Snap () -> (ByteString, Snap ())
+
+methodRoute :: Method -> MethodRoute
+methodRoute m r h = (r, method m h)
+
+get :: MethodRoute
+get = methodRoute GET
+
+put :: MethodRoute
+put = methodRoute PUT
+
+post :: MethodRoute
+post = methodRoute POST
+
+delete :: MethodRoute
+delete = methodRoute DELETE
+
+
 param :: ByteString -> Snap ByteString
 param = paramMap Just
 

@@ -41,14 +41,14 @@ data SimState = SimState {
     simSpeed :: Double
 } deriving (Data, Typeable)
 
+
 site :: MVar SimState -> Snap ()
 site sim = catch500 $
-          route [ ("",                    fileServe "static/index.html")
-                , ("vessel/speed/:speed", method PUT $ putSpeed sim)
-                , ("vessel",              method GET $ getSim sim)
-                , ("echo/:s",             echo)
-                ]
-      <|> fileServe "static"
+           route [ get ""                    $ fileServe "static/index.html"
+                 , put "vessel/speed/:speed" $ putSpeed sim
+                 , get "vessel"              $ getSim sim
+                 ]
+       <|> fileServe "static"
 
 
 putSpeed :: MVar SimState -> Snap ()
