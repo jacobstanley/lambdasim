@@ -73,29 +73,46 @@
     [contentView addSubview:speedStartLabel];
     [contentView addSubview:speedEndLabel];
 
-    var request = [CPURLRequest requestWithURL:"vessel"];
-    [CPURLConnection connectionWithRequest:request delegate:self];
+    [self requestData:nil];
 
     [theWindow orderFront:self];
 }
 
-- (void)speedChanged:(id)sender
+- (void)scheduleRequestData
 {
-    var request = [CPURLRequest requestWithURL:
-        "vessel/speed/" + [speed doubleValue]]
-    [request setHTTPMethod:"PUT"]
-    [CPURLConnection connectionWithRequest:request delegate:nil];
+    [CPTimer scheduledTimerWithTimeInterval:0.1
+             target:self
+             selector:@selector(requestData:)
+             userInfo:nil
+             repeats:NO];
+}
+
+- (void)requestData:(CPTimer)aTimer
+{
+    var request = [CPURLRequest requestWithURL:"vessel"];
+    [CPURLConnection connectionWithRequest:request delegate:self];
 }
 
 - (void)connection:(CPURLConnection)connection didReceiveData:(CPString)data
 {
-    var result = JSON.parse(data)
-    [speed setDoubleValue:result.simSpeed]
+    var result = JSON.parse(data);
+    [speed setDoubleValue:result.simSpeed];
+    [self scheduleRequestData];
 }
 
 - (void)connection:(CPURLConnection)connection didFailWithError:(CPString)error
 {
-    [label setStringValue:error]
+    [label setStringValue:error];
+}
+
+- (void)speedChanged:(id)sender
+{
+    if (inReceiveData) return;
+
+    var request = [CPURLRequest requestWithURL:
+        "vessel/speed/" + [speed doubleValue]];
+    [request setHTTPMethod:"PUT"];
+    [CPURLConnection connectionWithRequest:request delegate:nil];
 }
 
 - (CPTextField)labelWithTitle:(CPString)aTitle
