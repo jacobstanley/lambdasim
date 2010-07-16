@@ -23,7 +23,7 @@ import           Lambdasim.Snap
 main :: IO ()
 main = do
     port <- liftM parseArgs getArgs
-    sim <- newMVar $ SimState 0
+    sim <- newMVar $ SimState 0 0 0
     putStrLn $ "Starting Lambdaλsim on port " ++ show port
     httpServe "*" port "hostname"
         (Just "access.log")
@@ -38,24 +38,33 @@ parseArgs (p:_) = read p
 
 
 data SimState = SimState {
-    simSpeed :: Double
+    simSpeed :: Double,
+    simHeading :: Double,
+    simRudder :: Double
 } deriving (Data, Typeable)
 
 
 site :: MVar SimState -> Snap ()
 site sim = catch500 $
            route
-           [ get ""                    $ fileServe "static/index.html"
-           , put "vessel/speed/:speed" $ putSpeed sim
-           , get "vessel"              $ getSim sim
+           [ get ""                        $ fileServe "static/index.html"
+           , put "vessel/speed/:speed"     $ putSpeed sim
+           , put "vessel/heading/:heading" $ putHeading sim
+           , put "vessel/rudder/:rudder"   $ putRudder sim
+           , get "vessel"                  $ getSim sim
            ]
        <|> fileServe "static"
 
 
-putSpeed :: MVar SimState -> Snap ()
-putSpeed sim = do
-    speed <- paramDouble "speed"
-    liftIO $ modifyMVar_ sim $ \x -> return x { simSpeed = speed }
+putSpeed   = modifySim "speed"   $ \p x -> x { simSpeed = p }
+putHeading = modifySim "heading" $ \p x -> x { simHeading = p }
+putRudder  = modifySim "rudder"  $ \p x -> x { simRudder = p }
+
+modifySim :: ByteString -> (Double -> SimState -> SimState) -> MVar SimState -> Snap ()
+modifySim paramName f sim = do
+    p <- paramDouble paramName
+    liftIO $ modifyMVar_ sim $ \x -> return (f p x)
+    liftIO $ putStrLn $ (B.unpack paramName) ++ ": " ++ (show p)
     modifyResponse $ setContentType "application/json"
 
 getSim :: MVar SimState -> Snap ()
