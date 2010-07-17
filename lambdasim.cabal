@@ -26,14 +26,21 @@ Executable lambdasim
     base == 4.*,
     bytestring,
     bytestring-lexing == 0.2.*,
+    derive == 2.3.*,
+    dimensional == 0.8.*,
     filepath,
     haskell98,
     json,
     MonadCatchIO-transformers == 0.2.*,
     monads-fd == 0.1.*,
+    network == 2.2.*,
+    parallel == 2.2.*,
+    old-locale == 1.0.*,
     snap-core == 0.2.*,
     snap-server == 0.2.*,
+    stm == 2.1.*,
     text == 0.7.*,
+    time == 1.1.*,
     xhtml-combinators == 0.2.*
 
   ghc-options: -O2 -Wall -fwarn-tabs -funbox-strict-fields -threaded -fno-warn-unused-imports

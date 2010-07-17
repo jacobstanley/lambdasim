@@ -46,9 +46,9 @@ var fetcher = {
         var that = this;
         $.get('/vessel', function(v) {
             if (id >= that._min) {
-                $('#speed-slider').slider('update', v.simSpeed);
-                $('#heading-slider').slider('update', v.simHeading);
-                $('#rudder-slider').slider('update', v.simRudder);
+                $('#speed-slider').slider('update', v.speed);
+                $('#heading-slider').slider('update', v.heading);
+                $('#rudder-slider').slider('update', v.rudder);
             }
             setTimeout(function() { that._fetch() }, 500);
         });

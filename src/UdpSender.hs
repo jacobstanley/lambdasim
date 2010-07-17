@@ -23,7 +23,7 @@ sendStr :: Socket -> String -> SockAddr -> IO ()
 sendStr _ [] _ = return ()
 sendStr sock msg addr = do
   sent <- sendTo sock msg addr
-  putStrLn ("(Sent " ++ show sent ++ " bytes to " ++ show addr ++ ")")
+  --putStrLn ("(Sent " ++ show sent ++ " bytes to " ++ show addr ++ ")")
   sendStr sock (genericDrop sent msg) addr
   sClose sock
   

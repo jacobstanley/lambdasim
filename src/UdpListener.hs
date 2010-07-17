@@ -2,7 +2,7 @@ import Network.Socket hiding (listen)
 
 type HandlerFunc = SockAddr -> String -> IO ()
 
-main = listen "2000" textHandler
+main = listen "8000" textHandler
 
 listen :: String -> HandlerFunc -> IO ()
 listen port handler = withSocketsDo $ do

@@ -1,29 +1,33 @@
-{-# LANGUAGE DeriveDataTypeable #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE PackageImports #-}
 
-module Main where
+module Main (main) where
 
 import           Control.Applicative
-import           Control.Concurrent.MVar
+import           Control.Concurrent.STM
 import           Control.Monad
 import"monads-fd"Control.Monad.Trans
 import           Data.ByteString.Char8 (ByteString)
 import qualified Data.ByteString.Char8 as B
-import           Data.Data
-import           Data.Typeable
+import           Numeric.Units.Dimensional.Prelude
+import           Prelude hiding ((/))
 import           Snap.Http.Server
 import           Snap.Types
 import           Snap.Util.FileServe
 import           System
+import           Text.JSON
 
 import           Lambdasim.Snap
+import           Primitives
+import           STM
+import           Simulation
+import           SimRunner
 
 
 main :: IO ()
 main = do
     port <- liftM parseArgs getArgs
-    sim <- newMVar $ SimState 0 0 0
+    sim <- startSimulation
     putStrLn $ "Starting Lambdaλsim on port " ++ show port
     httpServe "*" port "hostname"
         (Just "access.log")
@@ -37,14 +41,7 @@ parseArgs []    = 8080
 parseArgs (p:_) = read p
 
 
-data SimState = SimState {
-    simSpeed :: Double,
-    simHeading :: Double,
-    simRudder :: Double
-} deriving (Data, Typeable)
-
-
-site :: MVar SimState -> Snap ()
+site :: TVar Simulation -> Snap ()
 site sim = catch500 $
            route
            [ get ""                        $ fileServe "static/index.html"
@@ -56,27 +53,28 @@ site sim = catch500 $
        <|> fileServe "static"
 
 
-putSpeed   = modifySim "speed"   $ \p x -> x { simSpeed = p }
-putHeading = modifySim "heading" $ \p x -> x { simHeading = p }
-putRudder  = modifySim "rudder"  $ \p x -> x { simRudder = p }
+putSpeed   = modifyVessel "speed"   $ \x v -> v { vesSpeed   = x *~ knot }
+putHeading = modifyVessel "heading" $ \x v -> v { vesHeading = x *~ degree }
+putRudder  = modifyVessel "rudder"  $ \x v -> v { vesRudder  = x *~ (degree / second) }
 
-modifySim :: ByteString -> (Double -> SimState -> SimState) -> MVar SimState -> Snap ()
-modifySim paramName f sim = do
-    p <- paramDouble paramName
-    liftIO $ modifyMVar_ sim $ \x -> return (f p x)
-    liftIO $ putStrLn $ (B.unpack paramName) ++ ": " ++ (show p)
+modifyVessel :: ByteString -> (Double -> Vessel -> Vessel) -> TVar Simulation -> Snap ()
+modifyVessel paramName f sim = do
+    value <- paramDouble paramName
+    liftIO $ stmApply (updateFirstVessel $ f value) sim
+    liftIO $ putStrLn $ (B.unpack paramName) ++ ": " ++ (show value)
     modifyResponse $ setContentType "application/json"
 
-getSim :: MVar SimState -> Snap ()
+getSim :: TVar Simulation -> Snap ()
 getSim sim = do
-    s <- liftIO $ readMVar sim
-    writeJSON s
+    s <- liftIO $ stmRead sim
+    writeJSON $ toJson $ head $ simVessels s
+  where
+    toJson v = makeObj' [("speed", vesSpeed v /~ knot),
+                         ("heading", vesHeading v /~ degree),
+                         ("rudder", vesRudder v /~ (degree / second))
+                        ]
 
-echo :: Snap ()
-echo = do
-    s <- param "s"
-    writeJSON $ Echo s
-
-data Echo = Echo {
-    eText :: ByteString
-} deriving (Eq, Show, Typeable, Data)
+makeObj' :: [(String, Double)] -> JSValue
+makeObj' xs = makeObj $ map f xs
+  where
+    f (k, v) = (k, JSRational True $ toRational v)

@@ -20,9 +20,9 @@ import           Text.JSON.Generic
 import qualified Text.XHtmlCombinators.Escape as XH
 
 
-writeJSON :: (Data a) => a -> Snap ()
+writeJSON :: (JSON a) => a -> Snap ()
 writeJSON json = do
-    writeBS $ B.pack $ encodeJSON json
+    writeBS $ B.pack $ encode json
     modifyResponse $ setContentType "application/json"
 
 

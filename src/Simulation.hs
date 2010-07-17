@@ -12,7 +12,7 @@ import Data.Derive.NFData
 import Text.Printf (printf)
 import Control.Parallel.Strategies
 import Numeric.Units.Dimensional.Prelude
-import Prelude hiding ((+),(*),(/))
+import Prelude hiding ((+),(*),(/),(-))
 
 class AdvanceTime a where
   advanceBy :: Time' -> a -> a
@@ -66,12 +66,20 @@ instance Show Vessel where
 instance AdvanceTime Vessel where
   advanceBy t v =
     v { vesPosition = translate dst hdg pos,
-        vesHeading = hdg + (rdr * t) }
+        vesHeading = normalize360 $ hdg + (rdr * t) }
     where pos = vesPosition v
           hdg = vesHeading v
           rdr = vesRudder v
           spd = vesSpeed v
           dst = spd * t
+
+normalize360 :: Angle' -> Angle'
+normalize360 x | x <  deg0   = normalize360 (x + deg360)
+               | x >= deg360 = normalize360 (x - deg360)
+               | otherwise   = x
+  where
+    deg0 = 0.0 *~ degree
+    deg360 = 360.0 *~ degree
 
 newVessel :: Vessel
 newVessel = Vessel {
