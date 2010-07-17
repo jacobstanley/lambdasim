@@ -69,9 +69,9 @@ getSim sim = do
     s <- liftIO $ stmRead sim
     writeJSON $ toJson $ head $ simVessels s
   where
-    toJson v = makeObj' [("speed", vesSpeed v /~ knot),
+    toJson v = makeObj' [("speed",   vesSpeed   v /~ knot),
                          ("heading", vesHeading v /~ degree),
-                         ("rudder", vesRudder v /~ (degree / second))
+                         ("rudder",  vesRudder  v /~ (degree / second))
                         ]
 
 makeObj' :: [(String, Double)] -> JSValue
