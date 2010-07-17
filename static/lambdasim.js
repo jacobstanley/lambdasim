@@ -16,7 +16,7 @@ function mkSlider(name, header, units, min, max, step) {
             labelValue(ui.value);
             $.put('/vessel/' + name + '/' + ui.value);
         },
-    });
+    }).addTouch();
 
     var labelDigits = step < 1 ? 1 : 0;
     function labelValue(value) {
