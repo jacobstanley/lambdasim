@@ -9,10 +9,10 @@ function mkSlider(name, header, units, min, max, step) {
     control.slider({
         min: min, max: max, step: step,
         animate: true, width: 300,
-        change: function(ev, ui) {
+        change: function(event, ui) {
             labelValue(ui.value);
         },
-        slide: function(ev, ui) {
+        slide: function(event, ui) {
             labelValue(ui.value);
             $.put('/vessel/' + name + '/' + ui.value);
         },
@@ -53,7 +53,7 @@ function _ajax_request(url, data, callback, type, method) {
         data: data,
         success: callback,
         dataType: type
-        });
+    });
 }
 
 jQuery.extend({
