@@ -15,6 +15,7 @@ function mkSlider(name, header, units, min, max, step) {
         slide: function(event, ui) {
             labelValue(ui.value);
             $.put('/vessel/' + name + '/' + ui.value);
+            fetcher.ignoreLast();
         },
     }).addTouch();
 
@@ -23,19 +24,38 @@ function mkSlider(name, header, units, min, max, step) {
         label.text(header + ': ' + value.toFixed(labelDigits) + units);
     }
 
-    control.slider('value', 0);
+    control.slider('update', 0);
 }
 
-function fetchValues() {
-    $.get('/vessel', function(v) {
-        $('#speed-slider').slider('value', v.simSpeed);
-        $('#heading-slider').slider('value', v.simHeading);
-        $('#rudder-slider').slider('value', v.simRudder);
-        setTimeout(fetchValues, 500);
-    });
-}
+var fetcher = {
+    ignoreLast: function() {
+        this._min = this._next;
+    },
+    start: function() {
+        this._fetch();
+    },
+    _next: 0,
+    _min: 0,
+    _increment: function() {
+        var id = this._next;
+        this._next++;
+        return id;
+    },
+    _fetch: function() {
+        var id = this._increment();
+        var that = this;
+        $.get('/vessel', function(v) {
+            if (id >= that._min) {
+                $('#speed-slider').slider('update', v.simSpeed);
+                $('#heading-slider').slider('update', v.simHeading);
+                $('#rudder-slider').slider('update', v.simRudder);
+            }
+            setTimeout(function() { that._fetch() }, 500);
+        });
+    }
+};
 
-fetchValues();
+fetcher.start();
 
 
 //
@@ -63,4 +83,11 @@ jQuery.extend({
     delete_: function(url, data, callback, type) {
         return _ajax_request(url, data, callback, type, 'DELETE');
     }
+});
+
+jQuery.fn.extend(jQuery.ui.slider.prototype, {
+    update: function(value) {
+        if (this._mouseSliding || this._keySliding) return;
+        this.value(value);
+    },
 });
