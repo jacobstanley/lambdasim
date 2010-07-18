@@ -7,8 +7,7 @@ function mkSlider(name, header, units, min, max, step) {
     var label = $('#' + name + '-label');
 
     control.slider({
-        min: min, max: max, step: step,
-        animate: true, width: 300,
+        min: min, max: max, step: step, animate: true,
         change: function(event, ui) {
             labelValue(ui.value);
         },
