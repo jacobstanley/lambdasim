@@ -18,10 +18,10 @@ import           System
 import           Text.JSON
 
 import           Lambdasim.Snap
-import           Primitives
-import           SimRunner
-import           Simulation
-import           STM
+import           Lambdasim.Primitives
+import           Lambdasim.SimRunner
+import           Lambdasim.Simulation
+import           Lambdasim.STM
 
 
 main :: IO ()

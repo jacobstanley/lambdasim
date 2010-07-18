@@ -1,12 +1,12 @@
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 
-module Primitives (
+module Lambdasim.Primitives (
     module Numeric.Units.Dimensional.Prelude,
-    Primitives.Angle,
-    Primitives.AngularVelocity,
-    Primitives.Length,
-    Primitives.Time,
-    Primitives.Velocity,
+    Lambdasim.Primitives.Angle,
+    Lambdasim.Primitives.AngularVelocity,
+    Lambdasim.Primitives.Length,
+    Lambdasim.Primitives.Time,
+    Lambdasim.Primitives.Velocity,
     knot
 ) where
 

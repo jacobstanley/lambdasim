@@ -1,4 +1,4 @@
-module NMEA where
+module Lambdasim.NMEA where
 
 import           Data.Bits(xor)
 import           Data.Char(ord)
@@ -9,8 +9,8 @@ import qualified Prelude as P ((+))
 import           System.Locale(defaultTimeLocale)
 import           Text.Printf(printf)
 
-import           Primitives
-import           Geographical
+import           Lambdasim.Primitives
+import           Lambdasim.Geographical
 
 
 data FixQuality

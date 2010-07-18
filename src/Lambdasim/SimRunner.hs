@@ -1,4 +1,4 @@
-module SimRunner (
+module Lambdasim.SimRunner (
     startSimulation,
 ) where
 
@@ -8,12 +8,12 @@ import Control.Monad
 import Control.Parallel.Strategies
 import Data.Time (UTCTime, getCurrentTime)
 
-import NMEA
-import Primitives
-import Simulation
-import STM
-import Time
-import UdpSender
+import Lambdasim.NMEA
+import Lambdasim.Primitives
+import Lambdasim.Simulation
+import Lambdasim.STM
+import Lambdasim.Time
+import Lambdasim.UdpSender
 
 
 startSimulation :: IO (TVar Simulation)

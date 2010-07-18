@@ -1,4 +1,9 @@
-module STM where
+module Lambdasim.STM (
+    stmNew,
+    stmRead,
+    stmApply,
+    stmUpdate,
+) where
 
 import Control.Concurrent.STM
 

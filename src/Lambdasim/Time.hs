@@ -1,13 +1,13 @@
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 
-module Time where
+module Lambdasim.Time where
 
 import Data.Time hiding (utc)
 import Data.Ratio ((%))
 import Control.Monad (liftM)
 import Control.Parallel.Strategies
 
-import Primitives
+import Lambdasim.Primitives
 
 
 addTime :: Time -> UTCTime -> UTCTime

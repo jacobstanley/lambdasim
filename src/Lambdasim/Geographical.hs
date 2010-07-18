@@ -1,10 +1,14 @@
-module Geographical where
+module Lambdasim.Geographical (
+    Geog (Geog),
+    mkGeog,
+    translate,
+) where
 
 import Control.Parallel.Strategies
 import Prelude ()
 import Text.Printf (printf)
 
-import Primitives
+import Lambdasim.Primitives
 
 
 type Latitude = Angle

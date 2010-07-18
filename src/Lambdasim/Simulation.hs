@@ -1,6 +1,6 @@
 {-# LANGUAGE TemplateHaskell #-}
 
-module Simulation where
+module Lambdasim.Simulation where
 
 import Control.Parallel.Strategies
 import Data.DeriveTH
@@ -8,9 +8,9 @@ import Data.Time (UTCTime)
 import Prelude ()
 import Text.Printf (printf)
 
-import Geographical
-import Primitives
-import Time
+import Lambdasim.Geographical
+import Lambdasim.Primitives
+import Lambdasim.Time
 
 
 class AdvanceTime a where
