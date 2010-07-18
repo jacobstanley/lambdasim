@@ -1,20 +1,17 @@
 module NMEA where
 
-import Primitives
-import Geographical
+import           Data.Bits(xor)
+import           Data.Char(ord)
+import           Data.List
+import           Data.Time.Clock
+import           Data.Time.Format(formatTime)
+import qualified Prelude as P ((+))
+import           System.Locale(defaultTimeLocale)
+import           Text.Printf(printf)
 
-import Data.Time.Clock
-import Data.Char(ord)
-import Data.Bits(xor)
-import Data.List
-import Numeric(showHex)
-import Text.Printf(printf)
-import System.Locale(defaultTimeLocale)
-import Data.Time.Format(formatTime)
-import Numeric.Units.Dimensional
-import Numeric.Units.Dimensional.SIUnits
-import Prelude as P ((+))
-import Prelude hiding ((-),(+),abs)
+import           Primitives
+import           Geographical
+
 
 data FixQuality
   = Invalid | GPS | DGPS | PPS  | RTK | FloatRTK
@@ -42,17 +39,23 @@ gga time (Geog lat lon elh) quality = nmea
   , ""
   ]
 
+latHemisphere :: Angle -> String
 latHemisphere x = hemisphere "N" "S" (x /~ degree)
+
+lonHemisphere :: Angle -> String
 lonHemisphere x = hemisphere "E" "W" (x /~ degree)
 
 hemisphere :: (Num b, Ord b) => a -> a -> b -> a
 hemisphere pos neg x | x > 0     = pos
                      | otherwise = neg
 
+latDecimalMinutes :: Angle -> String
 latDecimalMinutes = decimalMinutes 2 6
+
+lonDecimalMinutes :: Angle -> String
 lonDecimalMinutes = decimalMinutes 3 6
 
-decimalMinutes :: Int -> Int -> Angle' -> String
+decimalMinutes :: Int -> Int -> Angle -> String
 decimalMinutes degreeDigits minuteDecimals angle =
   printf format degrees minutes
   where angle' = abs angle

@@ -4,8 +4,10 @@ import Network.Socket hiding (listen)
 import Data.List (genericDrop)
 import System.IO (hFlush,stdout)
 
+
 type HandlerFunc = SockAddr -> String -> IO ()
 
+testUdp :: IO ()
 testUdp = do
   putStr "> "
   hFlush stdout

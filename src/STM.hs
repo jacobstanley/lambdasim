@@ -2,6 +2,7 @@ module STM where
 
 import Control.Concurrent.STM
 
+
 stmNew :: a -> IO (TVar a)
 stmNew x = atomically (newTVar x)
 
@@ -11,7 +12,7 @@ stmRead tx = atomically (readTVar tx)
 stmApply :: (a -> a) -> TVar a -> IO ()
 stmApply f tx = atomically $ do
   x <- readTVar tx
-  writeTVar tx $! (f x)
+  writeTVar tx $! f x
 
 stmUpdate :: (a -> a) -> TVar a -> IO a
 stmUpdate f tx = atomically $ do

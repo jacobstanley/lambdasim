@@ -8,7 +8,7 @@ module Lambdasim.Snap where
 import           Control.Applicative
 import           Control.Exception (SomeException)
 import           Control.Monad.CatchIO
-import"monads-fd"Control.Monad.Trans
+import"monads-fd"Control.Monad.Trans ()
 import           Data.ByteString.Char8 (ByteString)
 import qualified Data.ByteString.Char8 as B
 import           Data.ByteString.Lex.Double (readDouble)

@@ -2,20 +2,19 @@ module SimRunner (
     startSimulation,
 ) where
 
+import Control.Concurrent
+import Control.Concurrent.STM
+import Control.Monad
+import Control.Parallel.Strategies
+import Data.Time (UTCTime, getCurrentTime)
+
 import NMEA
 import Primitives
-import STM
 import Simulation
+import STM
 import Time
 import UdpSender
 
-import Data.Time
-import Control.Monad
-import Control.Concurrent
-import Control.Concurrent.STM
-import Control.Parallel.Strategies
-import Numeric.Units.Dimensional.Prelude
-import Prelude hiding ((/))
 
 startSimulation :: IO (TVar Simulation)
 startSimulation = do
@@ -42,7 +41,7 @@ toNMEA sim = gga utc pos GPS
   where utc = simTime sim
         pos = vesPosition $ head $ simVessels sim
 
-sleep :: Time' -> IO ()
+sleep :: Time -> IO ()
 sleep t = threadDelay us
   where us = round (t /~ micro second)
 
@@ -55,5 +54,5 @@ advanceTo t s
         proposedTime = addTime timeStep t
         s' = advanceBy timeStep s
 
-timeStep :: Time'
+timeStep :: Time
 timeStep = 5 *~ milli second

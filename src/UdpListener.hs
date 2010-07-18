@@ -1,5 +1,6 @@
 import Network.Socket hiding (listen)
 
+
 type HandlerFunc = SockAddr -> String -> IO ()
 
 main = listen "8000" textHandler
@@ -10,7 +11,7 @@ listen port handler = withSocketsDo $ do
   let family = addrFamily serverAddr
   let address = addrAddress serverAddr
   
-  putStrLn $ "Listening on " ++ (show address) ++ " (" ++ (show family) ++ ")"
+  putStrLn $ "Listening on " ++ show address ++ " (" ++ show family ++ ")"
 
   sock <- socket family Datagram defaultProtocol
   bindSocket sock address

@@ -10,7 +10,7 @@ import"monads-fd"Control.Monad.Trans
 import           Data.ByteString.Char8 (ByteString)
 import qualified Data.ByteString.Char8 as B
 import           Numeric.Units.Dimensional.Prelude
-import           Prelude hiding ((/))
+import           Prelude ()
 import           Snap.Http.Server
 import           Snap.Types
 import           Snap.Util.FileServe
@@ -19,9 +19,9 @@ import           Text.JSON
 
 import           Lambdasim.Snap
 import           Primitives
-import           STM
-import           Simulation
 import           SimRunner
+import           Simulation
+import           STM
 
 
 main :: IO ()
@@ -42,26 +42,24 @@ parseArgs (p:_) = read p
 
 
 site :: TVar Simulation -> Snap ()
-site sim = catch500 $
-           route
-           [ get ""                        $ fileServe "static/index.html"
-           , put "vessel/speed/:speed"     $ putSpeed sim
-           , put "vessel/heading/:heading" $ putHeading sim
-           , put "vessel/rudder/:rudder"   $ putRudder sim
-           , get "vessel"                  $ getSim sim
-           ]
+site sim = catch500 $ route
+         [ put "vessel/speed/:speed"     $ putSpeed sim
+         , put "vessel/heading/:heading" $ putHeading sim
+         , put "vessel/rudder/:rudder"   $ putRudder sim
+         , get "vessel"                  $ getSim sim
+         ]
+       <|> ifTop (fileServe "static/index.html")
        <|> fileServe "static"
-
-
-putSpeed   = modifyVessel "speed"   $ \x v -> v { vesSpeed   = x *~ knot }
-putHeading = modifyVessel "heading" $ \x v -> v { vesHeading = x *~ degree }
-putRudder  = modifyVessel "rudder"  $ \x v -> v { vesRudder  = x *~ (degree / second) }
+  where
+    putSpeed   = modifyVessel "speed"   $ \x v -> v { vesSpeed   = x *~ knot }
+    putHeading = modifyVessel "heading" $ \x v -> v { vesHeading = x *~ degree }
+    putRudder  = modifyVessel "rudder"  $ \x v -> v { vesRudder  = x *~ (degree / second) }
 
 modifyVessel :: ByteString -> (Double -> Vessel -> Vessel) -> TVar Simulation -> Snap ()
 modifyVessel paramName f sim = do
     value <- paramDouble paramName
     liftIO $ stmApply (updateFirstVessel $ f value) sim
-    liftIO $ putStrLn $ (B.unpack paramName) ++ ": " ++ (show value)
+    liftIO $ putStrLn $ B.unpack paramName ++ ": " ++ show value
     modifyResponse $ setContentType "application/json"
 
 getSim :: TVar Simulation -> Snap ()

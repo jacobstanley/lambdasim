@@ -1,14 +1,15 @@
 module Geographical where
 
-import qualified Prelude
-import Primitives
-import Numeric.Units.Dimensional.Prelude
 import Control.Parallel.Strategies
+import Prelude ()
 import Text.Printf (printf)
 
-type Latitude = Angle'
-type Longitude = Angle'
-type EllipsoidalHeight = Length'
+import Primitives
+
+
+type Latitude = Angle
+type Longitude = Angle
+type EllipsoidalHeight = Length
 
 data Geog = Geog Latitude Longitude EllipsoidalHeight
 
@@ -23,10 +24,10 @@ mkGeog lat lon elh = Geog (lat *~ degree)
                           (lon *~ degree)
                           (elh *~ metre)
 
-earthRadius :: Length'
+earthRadius :: Length
 earthRadius = 6378137 *~ meter
 
-translate :: Length' -> Angle' -> Geog -> Geog
+translate :: Length -> Angle -> Geog -> Geog
 translate dst hdg (Geog lat lon elh) = pos'
   where pos' = Geog lat' lon' elh
         angDst = dst / earthRadius

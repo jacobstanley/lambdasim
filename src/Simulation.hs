@@ -2,20 +2,19 @@
 
 module Simulation where
 
+import Control.Parallel.Strategies
+import Data.DeriveTH
+import Data.Time (UTCTime)
+import Prelude ()
+import Text.Printf (printf)
+
 import Geographical
 import Primitives
 import Time
 
-import Data.Time
-import Data.DeriveTH
-import Data.Derive.NFData
-import Text.Printf (printf)
-import Control.Parallel.Strategies
-import Numeric.Units.Dimensional.Prelude
-import Prelude hiding ((+),(*),(/),(-))
 
 class AdvanceTime a where
-  advanceBy :: Time' -> a -> a
+  advanceBy :: Time -> a -> a
 
 data Simulation = Simulation {
   simTime :: UTCTime,
@@ -53,14 +52,14 @@ updateFirstVessel f = updateVessels update
 
 data Vessel = Vessel {
   vesPosition :: Geog,
-  vesHeading :: Angle',
-  vesRudder :: AngularVelocity',
-  vesSpeed :: Velocity'
+  vesHeading :: Angle,
+  vesRudder :: AngularVelocity,
+  vesSpeed :: Velocity
 }
 
 instance Show Vessel where
   show v = printf "Vessel Pos: %s Hdg: %.2f deg" p h
-    where h = (vesHeading v) /~ degree
+    where h = vesHeading v /~ degree
           p = show (vesPosition v)
 
 instance AdvanceTime Vessel where
@@ -73,7 +72,7 @@ instance AdvanceTime Vessel where
           spd = vesSpeed v
           dst = spd * t
 
-normalize360 :: Angle' -> Angle'
+normalize360 :: Angle -> Angle
 normalize360 x | x <  deg0   = normalize360 (x + deg360)
                | x >= deg360 = normalize360 (x - deg360)
                | otherwise   = x
