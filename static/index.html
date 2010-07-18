@@ -10,14 +10,14 @@
   <style type="text/css">
     html {
       font-family: tahoma, helvetica, arial, sans-serif;
-      background-color: #f0f5f7;
-      color: #091e2b;
+      background-color: #F0F5F7;
+      color: #091E2B;
     }
     h1 {
       font-size: 1.5em;
       font-weight: bold;
       text-align: center;
-      text-shadow: 2px 2px 3px #9bb7c2;
+      text-shadow: 2px 2px 3px #9BB7C2;
       margin: 0.5em 0;
     }
     h3 {
@@ -28,9 +28,24 @@
       width: 300px;
       margin: 0 auto;
       padding: 1px 20px 25px;
-      background-color: #d8e5eb;
-      -moz-border-radius: 15px;
+
+      border: 1px solid #C7D4D9;
+      background-color: #D8E5EB;
+      background: -webkit-gradient(
+        linear, left top, right bottom,
+        color-stop(0, rgb(228,241,247)),
+        color-stop(1, rgb(214,225,230))
+      );
+      background: -moz-linear-gradient(
+        left top,
+        rgb(228,241,247) 0%,
+        rgb(214,225,230) 100%
+      );
+
+      -moz-border-radius:    15px;
       -webkit-border-radius: 15px;
+      -moz-box-shadow:    1px 1px 8px #C4D3D9;
+      -webkit-box-shadow: 1px 1px 8px #C4D3D9;
     }
     .slider {
       margin: 0 9px;
