@@ -1,5 +1,5 @@
 /dist/
-/static/Build/
+/src/static/
 
 .DS_Store
 *.hp
@@ -12,5 +12,5 @@
 *.swp
 nmea.html
 lambdasim
-/access.log
-/error.log
+access.log
+error.log
