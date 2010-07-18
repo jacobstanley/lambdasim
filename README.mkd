@@ -1,0 +1,8 @@
+Lambdaλsim
+----------
+
+This is a simulator which can be used for testing and training users of
+offshore survey and navigation software.
+
+I'm using this as an experiment to learn enough Haskell to write a
+significant application.
