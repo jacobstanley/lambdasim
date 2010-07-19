@@ -26,7 +26,8 @@ writeJSON json = do
     modifyResponse $ setContentType "application/json"
 
 
-type MethodRoute = ByteString -> Snap () -> (ByteString, Snap ())
+type Route = (ByteString, Snap ())
+type MethodRoute = ByteString -> Snap () -> Route
 
 methodRoute :: Method -> MethodRoute
 methodRoute m r h = (r, method m h)
@@ -44,8 +45,8 @@ delete :: MethodRoute
 delete = methodRoute DELETE
 
 
-param :: ByteString -> Snap ByteString
-param = paramMap Just
+paramString :: ByteString -> Snap ByteString
+paramString = paramMap Just
 
 paramDouble :: ByteString -> Snap Double
 paramDouble = paramMap $ (fst <$>) . readDouble
