@@ -29,7 +29,7 @@ main :: IO ()
 main = do
     port <- liftM parseArgs getArgs
     sim <- startSimulation
-    putStrLn $ "Starting Lambdaλsim on port " ++ show port
+    putStrLn $ "Starting Lambdasim on port " ++ show port
     httpServe "*" port "hostname"
         (Just "access.log")
         (Just "error.log")
