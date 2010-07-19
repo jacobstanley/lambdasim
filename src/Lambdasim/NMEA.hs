@@ -31,6 +31,7 @@ gga time (Geog lat lon elh) quality = nmea
   , lonHemisphere lon
   , show $ fromEnum quality
   , "08"
+  , "0.0"
   , printf "%.1f" (elh /~ metre)
   , "M"
   , "0.0"
