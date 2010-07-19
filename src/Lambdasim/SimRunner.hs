@@ -27,7 +27,7 @@ startSimulation = do
 simulate :: TVar Simulation -> IO ()
 simulate sim = forever $ do
   t <- getCurrentTime
-  stmApply (advanceTo t) sim
+  stmUpdate_ (advanceTo t) sim
   sleep (1 *~ milli second)
 
 monitorUdp :: TVar Simulation -> IO ()

@@ -58,7 +58,7 @@ site sim = catch500 $ route
 modifyVessel :: ByteString -> (Double -> Vessel -> Vessel) -> TVar Simulation -> Snap ()
 modifyVessel paramName f sim = do
     value <- paramDouble paramName
-    liftIO $ stmApply (updateFirstVessel $ f value) sim
+    liftIO $ stmUpdate_ (updateFirstVessel $ f value) sim
     liftIO $ putStrLn $ B.unpack paramName ++ ": " ++ show value
     modifyResponse $ setContentType "application/json"
 
