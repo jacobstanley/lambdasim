@@ -6,6 +6,7 @@ import Control.Concurrent
 import Control.Concurrent.STM
 import Control.Monad
 import Control.Parallel.Strategies
+import Data.Record.Label
 import Data.Time (UTCTime, getCurrentTime)
 
 import Lambdasim.NMEA
@@ -38,8 +39,8 @@ monitorUdp sim = forever $ do
 
 toNMEA :: Simulation -> String
 toNMEA sim = gga utc pos GPS
-  where utc = simTime sim
-        pos = vesPosition $ head $ simVessels sim
+  where utc = get simTime sim
+        pos = get vesPosition $ head $ get simVessels sim
 
 sleep :: Time -> IO ()
 sleep t = threadDelay us
@@ -50,7 +51,7 @@ advanceTo t s
   | isLater   = s
   | otherwise = rnf s' `seq` s'
   where isLater = currentTime > proposedTime
-        currentTime = simTime s
+        currentTime = get simTime s
         proposedTime = addTime timeStep t
         s' = advanceBy timeStep s
 

@@ -9,6 +9,7 @@ import           Control.Monad
 import"monads-fd"Control.Monad.Trans
 import           Data.ByteString.Char8 (ByteString)
 import qualified Data.ByteString.Char8 as B
+import qualified Data.Record.Label as L
 import           Numeric.Units.Dimensional.Prelude
 import           Prelude ()
 import           Snap.Http.Server
@@ -51,9 +52,9 @@ site sim = catch500 $ route
        <|> ifTop (fileServe "static/index.html")
        <|> fileServe "static"
   where
-    putSpeed   = modifyVessel "speed"   $ \x v -> v { vesSpeed   = x *~ knot }
-    putHeading = modifyVessel "heading" $ \x v -> v { vesHeading = x *~ degree }
-    putRudder  = modifyVessel "rudder"  $ \x v -> v { vesRudder  = x *~ (degree / second) }
+    putSpeed   = modifyVessel "speed"   $ \x -> L.set vesSpeed   $ x *~ knot
+    putHeading = modifyVessel "heading" $ \x -> L.set vesHeading $ x *~ degree
+    putRudder  = modifyVessel "rudder"  $ \x -> L.set vesRudder  $ x *~ (degree / second)
 
 modifyVessel :: ByteString -> (Double -> Vessel -> Vessel) -> TVar Simulation -> Snap ()
 modifyVessel paramName f sim = do
@@ -65,11 +66,11 @@ modifyVessel paramName f sim = do
 getSim :: TVar Simulation -> Snap ()
 getSim sim = do
     s <- liftIO $ stmRead sim
-    writeJSON $ toJson $ head $ simVessels s
+    writeJSON $ toJson $ head $ L.get simVessels s
   where
-    toJson v = makeObj' [("speed",   vesSpeed   v /~ knot),
-                         ("heading", vesHeading v /~ degree),
-                         ("rudder",  vesRudder  v /~ (degree / second))
+    toJson v = makeObj' [("speed",   L.get vesSpeed   v /~ knot),
+                         ("heading", L.get vesHeading v /~ degree),
+                         ("rudder",  L.get vesRudder  v /~ (degree / second))
                         ]
 
 makeObj' :: [(String, Double)] -> JSValue
