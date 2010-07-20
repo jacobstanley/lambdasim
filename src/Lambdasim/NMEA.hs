@@ -1,4 +1,7 @@
-module Lambdasim.NMEA where
+module Lambdasim.NMEA (
+    FixQuality(..),
+    gga,
+) where
 
 import           Data.Bits(xor)
 import           Data.Char(ord)
@@ -17,9 +20,6 @@ data FixQuality
   = Invalid | GPS | DGPS | PPS  | RTK | FloatRTK
   | DeadReckoning | Manual | Simulation
   deriving (Enum, Show)
-
-type Satellites = Int
-type HDOP = Double
 
 gga :: UTCTime -> Geog -> FixQuality -> String
 gga time (Geog lat lon elh) quality = nmea
@@ -70,9 +70,8 @@ decimalMinutes degreeDigits minuteDecimals angle =
         mPrec = show minuteDecimals
 
 nmea :: [String] -> String
-nmea fields = "$" ++ sentence ++ "*" ++ checksum ++ "\r\n"
+nmea fields = "$" ++ sentence ++ "*" ++ checksum sentence ++ "\r\n"
   where sentence = intercalate "," fields
-        checksum = nmeaChecksum sentence
 
-nmeaChecksum :: String -> String
-nmeaChecksum xs = printf "%2X" $ foldl' xor 0 (map ord xs)
+checksum :: String -> String
+checksum xs = printf "%2X" $ foldl' xor 0 (map ord xs)
