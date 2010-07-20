@@ -8,14 +8,6 @@ import Data.List (genericDrop)
 import System.IO (hFlush,stdout)
 
 
-testUdp :: IO ()
-testUdp = do
-  putStr "> "
-  hFlush stdout
-  msg <- getLine
-  sendMsg "127.0.0.1" "8000" msg
-  testUdp
-
 sendMsg :: String -> String -> String -> IO ()
 sendMsg hostname port msg = withSocketsDo $ do
   serverAddr <- getServerAddr hostname port
@@ -34,3 +26,12 @@ getServerAddr :: String -> String -> IO AddrInfo
 getServerAddr hostname port = do
   addrInfos <- getAddrInfo Nothing (Just hostname) (Just port)
   return $ head addrInfos
+
+
+testUdp :: IO ()
+testUdp = do
+  putStr "> "
+  hFlush stdout
+  msg <- getLine
+  sendMsg "127.0.0.1" "8000" msg
+  testUdp
