@@ -1,5 +1,5 @@
 module Lambdasim.Geographical (
-    Geog (Geog),
+    Geog(..),
     mkGeog,
     translate,
 ) where
