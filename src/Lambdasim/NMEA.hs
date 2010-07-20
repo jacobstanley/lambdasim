@@ -70,7 +70,7 @@ decimalMinutes degreeDigits minuteDecimals angle =
         mPrec = show minuteDecimals
 
 nmea :: [String] -> String
-nmea fields = "$" ++ sentence ++ "*" ++ checksum
+nmea fields = "$" ++ sentence ++ "*" ++ checksum ++ "\r\n"
   where sentence = intercalate "," fields
         checksum = nmeaChecksum sentence
 
