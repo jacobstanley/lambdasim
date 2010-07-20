@@ -10,7 +10,8 @@ module Lambdasim.Label (
 
 import           Data.Record.Label hiding (get, set)
 import qualified Data.Record.Label as L
-import           Numeric.Units.Dimensional
+
+import           Lambdasim.Prelude
 
 
 getL :: (f :-> a) -> f -> a
@@ -25,7 +26,7 @@ headL = label getter setter where
     setter _ []     = []
     setter x (_:xs) = x:xs
 
-unitL :: (Num a, Fractional a) => Unit d a -> (Quantity d a :-> a)
+unitL :: Unit d -> (Quantity d :-> Double)
 unitL unit = label getter setter where
     getter x   = x /~ unit
     setter x _ = x *~ unit

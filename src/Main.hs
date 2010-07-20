@@ -5,23 +5,21 @@
 module Main (main) where
 
 import           Control.Applicative
-import           Control.Category
 import           Control.Concurrent.STM
 import           Control.Monad
 import"monads-fd"Control.Monad.Trans
 import           Data.ByteString.Char8 (ByteString)
 import qualified Data.ByteString.Char8 as B
-import           Numeric.Units.Dimensional.Prelude hiding ((.))
-import           Prelude ()
 import           Snap.Http.Server
 import           Snap.Types
 import           Snap.Util.FileServe
 import           System
 import           Text.JSON
 
+import           Prelude ()
+import           Lambdasim.Prelude
 import           Lambdasim.Label hiding (label)
 import           Lambdasim.Snap
-import           Lambdasim.Primitives hiding ((.))
 import           Lambdasim.SimRunner
 import           Lambdasim.Simulation
 import           Lambdasim.STM
@@ -56,7 +54,7 @@ site sim = catch500 $ route
   where
     putV = putVessel sim
 
-putVessel :: TVar Simulation -> ByteString -> (Vessel :-> Quantity d Double) -> Unit d Double -> Route
+putVessel :: TVar Simulation -> ByteString -> (Vessel :-> Quantity d) -> Unit d -> Route
 putVessel sim param label unit = put url $ modify param label' sim
   where
     url = B.concat ["vessel/", param, "/:", param]

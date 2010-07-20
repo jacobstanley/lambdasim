@@ -7,7 +7,8 @@ import Data.Ratio ((%))
 import Control.Monad (liftM)
 import Control.Parallel.Strategies
 
-import Lambdasim.Primitives
+import Prelude ()
+import Lambdasim.Prelude
 
 
 addTime :: Time -> UTCTime -> UTCTime

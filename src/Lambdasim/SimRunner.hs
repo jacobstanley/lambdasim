@@ -9,8 +9,9 @@ import Control.Parallel.Strategies
 import Data.Record.Label
 import Data.Time (UTCTime, getCurrentTime)
 
+import Prelude ()
+import Lambdasim.Prelude
 import Lambdasim.NMEA
-import Lambdasim.Primitives
 import Lambdasim.Simulation
 import Lambdasim.STM
 import Lambdasim.Time

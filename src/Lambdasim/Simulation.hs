@@ -7,11 +7,11 @@ import Control.Parallel.Strategies
 import Data.DeriveTH
 import Data.Record.Label
 import Data.Time (UTCTime)
-import Prelude ()
 import Text.Printf (printf)
 
+import Prelude ()
+import Lambdasim.Prelude
 import Lambdasim.Geographical
-import Lambdasim.Primitives
 import Lambdasim.Time
 
 

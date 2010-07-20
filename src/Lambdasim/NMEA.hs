@@ -5,11 +5,11 @@ import           Data.Char(ord)
 import           Data.List
 import           Data.Time.Clock
 import           Data.Time.Format(formatTime)
-import qualified Prelude as P ((+))
 import           System.Locale(defaultTimeLocale)
 import           Text.Printf(printf)
 
-import           Lambdasim.Primitives
+import qualified Prelude as P ((+))
+import           Lambdasim.Prelude
 import           Lambdasim.Geographical
 
 
