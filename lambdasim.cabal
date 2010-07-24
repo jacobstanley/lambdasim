@@ -19,8 +19,11 @@ Flag deps
   description: Use 'cabal install -fdeps' to install lambdasim's dependencies.
 
 Executable lambdasim
-  hs-source-dirs: src
   main-is: Main.hs
+  hs-source-dirs: src
+  include-dirs: cbits
+  c-sources: cbits/network.c
+  other-modules: Network.Interfaces
 
   if os(windows)
     cpp-options: -DWINDOWS

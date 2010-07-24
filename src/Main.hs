@@ -24,6 +24,7 @@ import           Lambdasim.Snap
 import           Lambdasim.SimRunner
 import           Lambdasim.Simulation
 import           Lambdasim.STM
+import           Network.Interfaces
 
 
 main :: IO ()
@@ -50,6 +51,7 @@ site sim = catch500 $ route
          , putV "heading" vesHeading degree
          , putV "rudder"  vesRudder (degree / second)
          , get "vessel" $ getSim sim
+         , get "network" $ networkInfo
          ]
        <|> ifTop (fileServe "static/index.html")
        <|> fileServe "static"
@@ -78,6 +80,13 @@ getSim sim = do
                          ("heading", getL vesHeading v /~ degree),
                          ("rudder",  getL vesRudder  v /~ (degree / second))
                         ]
+
+networkInfo :: Snap ()
+networkInfo = do
+    networks <- liftIO getLocalIPs
+    writeJSON $ toJSObject [("networks", networks)]
+  where
+    getLocalIPs = liftM (map netIP) getNetworkInterfaces
 
 makeObj' :: [(String, Double)] -> JSValue
 makeObj' xs = makeObj $ map f xs
