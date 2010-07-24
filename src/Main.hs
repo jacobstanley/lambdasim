@@ -18,6 +18,7 @@ import           Text.JSON
 
 import           Prelude ()
 import           Lambdasim.Prelude
+import           Lambdasim.Console
 import           Lambdasim.Label hiding (label)
 import           Lambdasim.Snap
 import           Lambdasim.SimRunner
@@ -27,9 +28,10 @@ import           Lambdasim.STM
 
 main :: IO ()
 main = do
+    enableUTF8
     port <- liftM parseArgs getArgs
     sim <- startSimulation
-    putStrLn $ "Starting Lambdasim on port " ++ show port
+    putStrLn $ "Starting Lambda\x03bbsim on port " ++ show port
     httpServe "*" port "hostname"
         (Just "access.log")
         (Just "error.log")
