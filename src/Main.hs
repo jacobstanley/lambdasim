@@ -10,6 +10,7 @@ import           Control.Monad
 import"monads-fd"Control.Monad.Trans
 import           Data.ByteString.Char8 (ByteString)
 import qualified Data.ByteString.Char8 as B
+import           Network.Info
 import           Snap.Http.Server
 import           Snap.Types
 import           Snap.Util.FileServe
@@ -24,7 +25,6 @@ import           Lambdasim.Snap
 import           Lambdasim.SimRunner
 import           Lambdasim.Simulation
 import           Lambdasim.STM
-import           Network.Info
 
 
 main :: IO ()
