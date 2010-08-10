@@ -51,7 +51,7 @@ Executable lambdasim
     time == 1.1.*,
     xhtml-combinators == 0.2.*
 
-  ghc-options: -O2 -threaded -Wall -Werror -fwarn-tabs -funbox-strict-fields -fno-warn-unused-do-bind
+  ghc-options: -O2 -threaded -Wall -fwarn-tabs -funbox-strict-fields -fno-warn-unused-do-bind
 
   if flag(deps)
     buildable: False
