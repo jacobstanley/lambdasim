@@ -3,7 +3,7 @@ Version:         0.1
 Synopsis:        Lambdaλsim: Simple Vessel Simulator 
 
 Description:
-  Simulates sensor output for a vessel for testing navigation software.
+  Simulates the sensor output of a vessel for testing navigation software.
 
 License:         BSD3
 License-file:    LICENSE
