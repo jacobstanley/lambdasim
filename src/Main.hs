@@ -24,7 +24,7 @@ import           Lambdasim.Snap
 import           Lambdasim.SimRunner
 import           Lambdasim.Simulation
 import           Lambdasim.STM
-import           Network.Interfaces
+import           Network.Info
 
 
 main :: IO ()
@@ -83,10 +83,12 @@ getSim sim = do
 
 networkInfo :: Snap ()
 networkInfo = do
-    networks <- liftIO getLocalIPs
+    networks <- liftIO getIPs
     writeJSON $ toJSObject [("networks", networks)]
   where
-    getLocalIPs = liftM (map netIP) getNetworkInterfaces
+    getIPs   = liftM extract getNetworkInterfaces
+    extract  = map show . filter (/= nullIPv4) . map ipv4
+    nullIPv4 = IPv4 0
 
 makeObj' :: [(String, Double)] -> JSValue
 makeObj' xs = makeObj $ map f xs

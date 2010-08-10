@@ -21,9 +21,6 @@ Flag deps
 Executable lambdasim
   main-is: Main.hs
   hs-source-dirs: src
-  include-dirs: cbits
-  c-sources: cbits/network.c
-  other-modules: Network.Interfaces
 
   if os(windows)
     cpp-options: -DWINDOWS
@@ -42,6 +39,7 @@ Executable lambdasim
     MonadCatchIO-transformers == 0.2.*,
     monads-fd == 0.1.*,
     network == 2.2.*,
+    network-info == 0.1.*,
     parallel == 2.2.*,
     old-locale == 1.0.*,
     snap-core == 0.2.*,
