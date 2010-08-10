@@ -15,7 +15,7 @@ import Lambdasim.NMEA
 import Lambdasim.Simulation
 import Lambdasim.STM
 import Lambdasim.Time
-import Lambdasim.UdpSender
+import Lambdasim.Udp
 
 
 startSimulation :: IO (TVar Simulation)

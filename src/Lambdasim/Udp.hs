@@ -1,4 +1,4 @@
-module Lambdasim.UdpSender (
+module Lambdasim.Udp (
     sendMsg,
     testUdp,
 ) where
@@ -13,6 +13,7 @@ sendMsg hostname port msg = withSocketsDo $ do
   serverAddr <- getServerAddr hostname port
   sock <- socket (addrFamily serverAddr) Datagram defaultProtocol
   sendStr sock msg (addrAddress serverAddr)
+
 
 sendStr :: Socket -> String -> SockAddr -> IO ()
 sendStr _ [] _ = return ()
