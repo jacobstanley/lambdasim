@@ -16,15 +16,15 @@ import Lambdasim.Time
 
 
 data Simulation = Simulation {
-  _simTime :: UTCTime,
-  _simVessels :: [Vessel]
+  _time :: UTCTime,
+  _vessels :: [Vessel]
 }
 
 data Vessel = Vessel {
-  _vesPosition :: Geog,
-  _vesHeading :: Angle,
-  _vesRudder :: AngularVelocity,
-  _vesSpeed :: Velocity
+  _position :: Geog,
+  _heading :: Angle,
+  _rudder :: AngularVelocity,
+  _speed :: Velocity
 }
 
 $(derive makeNFData ''Simulation)
@@ -32,13 +32,13 @@ $(derive makeNFData ''Vessel)
 
 $(mkLabels [''Simulation, ''Vessel])
 
-simVessels :: Simulation :-> [Vessel]
-simTime    :: Simulation :-> UTCTime
+vessels :: Simulation :-> [Vessel]
+time    :: Simulation :-> UTCTime
 
-vesPosition :: Vessel :-> Geog
-vesHeading  :: Vessel :-> Angle
-vesRudder   :: Vessel :-> AngularVelocity
-vesSpeed    :: Vessel :-> Velocity
+position :: Vessel :-> Geog
+heading  :: Vessel :-> Angle
+rudder   :: Vessel :-> AngularVelocity
+speed    :: Vessel :-> Velocity
 
 
 class AdvanceTime a where
@@ -49,24 +49,24 @@ instance Show Simulation where
   show s = printf "Simulation\n\
                   \  Time: %s\n\
                   \  Vessels: %s" t v
-    where t = show (get simTime s)
-          v = show (get simVessels s)
+    where t = show (get time s)
+          v = show (get vessels s)
 
 instance AdvanceTime Simulation where
-  advanceBy t s = set simTime (addTime t $ get simTime s) $
-                  set simVessels (map (advanceBy t) (get simVessels s)) s
+  advanceBy t s = set time (addTime t $ get time s) $
+                  set vessels (map (advanceBy t) (get vessels s)) s
 
 newSimulation :: UTCTime -> Simulation
 newSimulation utc = Simulation {
-  _simTime = utc,
-  _simVessels = []
+  _time = utc,
+  _vessels = []
 }
 
 addVessel :: Simulation -> Simulation
 addVessel = updateVessels (\vs -> newVessel : vs)
 
 updateVessels :: ([Vessel] -> [Vessel]) -> Simulation -> Simulation
-updateVessels f s = set simVessels (f $ get simVessels s) s
+updateVessels f s = set vessels (f $ get vessels s) s
 
 updateFirstVessel :: (Vessel -> Vessel) -> Simulation -> Simulation
 updateFirstVessel f = updateVessels update
@@ -76,16 +76,16 @@ updateFirstVessel f = updateVessels update
 
 instance Show Vessel where
   show v = printf "Vessel Pos: %s Hdg: %.2f deg" p h
-    where h = get vesHeading v /~ degree
-          p = show (get vesPosition v)
+    where h = get heading v /~ degree
+          p = show (get position v)
 
 instance AdvanceTime Vessel where
-  advanceBy t v = set vesPosition (translate dst hdg pos) $
-                  set vesHeading (normalize360 $ hdg + (rdr * t)) v
-    where pos = get vesPosition v
-          hdg = get vesHeading v
-          rdr = get vesRudder v
-          spd = get vesSpeed v
+  advanceBy t v = set position (translate dst hdg pos) $
+                  set heading (normalize360 $ hdg + (rdr * t)) v
+    where pos = get position v
+          hdg = get heading v
+          rdr = get rudder v
+          spd = get speed v
           dst = spd * t
 
 normalize360 :: Angle -> Angle
@@ -98,8 +98,8 @@ normalize360 x | x <  deg0   = normalize360 (x + deg360)
 
 newVessel :: Vessel
 newVessel = Vessel {
-  _vesPosition = mkGeog (-32) 116 0,
-  _vesHeading = 0 *~ degree,
-  _vesRudder  = 2 *~ (degree / second),
-  _vesSpeed   = 5 *~ knot
+  _position = mkGeog (-32) 116 0,
+  _heading = 0 *~ degree,
+  _rudder  = 2 *~ (degree / second),
+  _speed   = 5 *~ knot
 }

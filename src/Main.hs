@@ -47,9 +47,9 @@ parseArgs (p:_) = read p
 
 site :: TVar Simulation -> Snap ()
 site sim = catch500 $ route
-         [ putV "speed"   vesSpeed   knot
-         , putV "heading" vesHeading degree
-         , putV "rudder"  vesRudder (degree / second)
+         [ putV "speed"   speed   knot
+         , putV "heading" heading degree
+         , putV "rudder"  rudder (degree / second)
          , get "vessel" $ getSim sim
          , get "network" $ networkInfo
          ]
@@ -62,7 +62,7 @@ putVessel :: TVar Simulation -> ByteString -> (Vessel :-> Quantity d) -> Unit d 
 putVessel sim param label unit = put url $ modify param label' sim
   where
     url = B.concat ["vessel/", param, "/:", param]
-    label' = unitL unit . label . headL . simVessels 
+    label' = unitL unit . label . headL . vessels 
 
 modify :: ByteString -> (a :-> Double) -> TVar a -> Snap ()
 modify param label tvar = do
@@ -74,11 +74,11 @@ modify param label tvar = do
 getSim :: TVar Simulation -> Snap ()
 getSim sim = do
     s <- liftIO $ stmRead sim
-    writeJSON $ toJson $ head $ getL simVessels s
+    writeJSON $ toJson $ head $ getL vessels s
   where
-    toJson v = makeObj' [("speed",   getL vesSpeed   v /~ knot),
-                         ("heading", getL vesHeading v /~ degree),
-                         ("rudder",  getL vesRudder  v /~ (degree / second))
+    toJson v = makeObj' [("speed",   getL speed   v /~ knot),
+                         ("heading", getL heading v /~ degree),
+                         ("rudder",  getL rudder  v /~ (degree / second))
                         ]
 
 networkInfo :: Snap ()

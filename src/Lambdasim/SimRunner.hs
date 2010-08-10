@@ -40,8 +40,8 @@ monitorUdp sim = forever $ do
 
 toNMEA :: Simulation -> String
 toNMEA sim = gga utc pos GPS
-  where utc = get simTime sim
-        pos = get vesPosition $ head $ get simVessels sim
+  where utc = get time sim
+        pos = get position $ head $ get vessels sim
 
 sleep :: Time -> IO ()
 sleep t = threadDelay us
@@ -52,7 +52,7 @@ advanceTo t s
   | isLater   = s
   | otherwise = rnf s' `seq` s'
   where isLater = currentTime > proposedTime
-        currentTime = get simTime s
+        currentTime = get time s
         proposedTime = addTime timeStep t
         s' = advanceBy timeStep s
 
