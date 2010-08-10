@@ -28,11 +28,30 @@ startSimulation = do
     forkIO (monitorUdp s hosts)
     return s
 
+
 simulate :: TVar Simulation -> IO ()
 simulate sim = forever $ do
     t <- getCurrentTime
     stmUpdate_ (advanceTo t) sim
     sleep (1 *~ milli second)
+
+advanceTo :: UTCTime -> Simulation -> Simulation
+advanceTo t s
+    | isLater   = s
+    | otherwise = rnf s' `seq` s'
+  where
+    isLater = currentTime > proposedTime
+    currentTime = get time s
+    proposedTime = addTime timeStep t
+    s' = advanceBy timeStep s
+
+timeStep :: Time
+timeStep = 5 *~ milli second
+
+sleep :: Time -> IO ()
+sleep t = threadDelay us
+  where
+    us = round (t /~ micro second)
 
 
 type HostName = String
@@ -56,22 +75,3 @@ toNMEA sim = gga utc pos GPS
   where
     utc = get time sim
     pos = get position $ head $ get vessels sim
-
-sleep :: Time -> IO ()
-sleep t = threadDelay us
-  where
-    us = round (t /~ micro second)
-
-
-advanceTo :: UTCTime -> Simulation -> Simulation
-advanceTo t s
-    | isLater   = s
-    | otherwise = rnf s' `seq` s'
-  where
-    isLater = currentTime > proposedTime
-    currentTime = get time s
-    proposedTime = addTime timeStep t
-    s' = advanceBy timeStep s
-
-timeStep :: Time
-timeStep = 5 *~ milli second
