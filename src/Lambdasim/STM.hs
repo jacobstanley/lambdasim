@@ -16,12 +16,12 @@ stmRead tx = atomically (readTVar tx)
 
 stmUpdate :: (a -> a) -> TVar a -> IO a
 stmUpdate f tx = atomically $ do
-  x <- readTVar tx
-  let x' = f x
-  writeTVar tx $! x'
-  return x'
+    x <- readTVar tx
+    let x' = f x
+    writeTVar tx $! x'
+    return x'
 
 stmUpdate_ :: (a -> a) -> TVar a -> IO ()
 stmUpdate_ f tx = atomically $ do
-  x <- readTVar tx
-  writeTVar tx $! f x
+    x <- readTVar tx
+    writeTVar tx $! f x

@@ -76,9 +76,9 @@ getSim sim = do
     s <- liftIO $ stmRead sim
     writeJSON $ toJson $ head $ getL vessels s
   where
-    toJson v = makeObj' [("speed",   getL speed   v /~ knot),
-                         ("heading", getL heading v /~ degree),
-                         ("rudder",  getL rudder  v /~ (degree / second))
+    toJson v = makeObj' [ ("speed",   getL speed   v /~ knot)
+                        , ("heading", getL heading v /~ degree)
+                        , ("rudder",  getL rudder  v /~ (degree / second))
                         ]
 
 networkInfo :: Snap ()

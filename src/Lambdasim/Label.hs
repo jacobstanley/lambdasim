@@ -21,12 +21,14 @@ setL :: (f :-> a) -> a -> f -> f
 setL = L.set
 
 headL :: [a] :-> a
-headL = label getter setter where
+headL = label getter setter
+  where
     getter          = head
     setter _ []     = []
     setter x (_:xs) = x:xs
 
 unitL :: Unit d -> (Quantity d :-> Double)
-unitL unit = label getter setter where
+unitL unit = label getter setter
+  where
     getter x   = x /~ unit
     setter x _ = x *~ unit
