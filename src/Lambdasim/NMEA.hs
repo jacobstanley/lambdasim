@@ -24,7 +24,7 @@ data FixQuality
 gga :: UTCTime -> Geog -> FixQuality -> String
 gga time (Geog lat lon elh) quality = nmea
     [ "GPGGA"
-    , formatTime defaultTimeLocale "%H%M%S" time
+    , take 9 $ formatTime defaultTimeLocale "%H%M%S%Q" time -- time of fix
     , latDecimalMinutes lat -- latitude
     , latHemisphere lat     -- latitude hemisphere
     , lonDecimalMinutes lon -- longitude
