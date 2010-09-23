@@ -1,3 +1,4 @@
+import Data.List.Utils (replace)
 import Network.Socket hiding (listen)
 
 
@@ -32,4 +33,7 @@ procMessages sock handler = do
 
 textHandler :: HandlerFunc
 textHandler addr msg =
-    putStrLn $ show addr ++ "> " ++ msg
+    putStrLn $ show addr ++ "> " ++ fix msg
+  where
+    fix = replace "\n" "<lf>" .
+          replace "\r" "<cr>"
