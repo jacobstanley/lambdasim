@@ -25,19 +25,19 @@ gga :: UTCTime -> Geog -> FixQuality -> String
 gga time (Geog lat lon elh) quality = nmea
     [ "GPGGA"
     , formatTime defaultTimeLocale "%H%M%S" time
-    , latDecimalMinutes lat
-    , latHemisphere lat
-    , lonDecimalMinutes lon
-    , lonHemisphere lon
+    , latDecimalMinutes lat -- latitude
+    , latHemisphere lat     -- latitude hemisphere
+    , lonDecimalMinutes lon -- longitude
+    , lonHemisphere lon     -- longitude hemisphere
     , show $ fromEnum quality
-    , "08"
-    , "0.0"
-    , printf "%.1f" (elh /~ metre)
-    , "M"
-    , "0.0"
-    , "M"
-    , ""
-    , ""
+    , "08"  -- number of satellites being tracked
+    , "0.0" -- horizontal dilution of position
+    , printf "%.1f" (elh /~ metre) -- altitude, metres above mean sea level
+    , "M"   -- units for altitude
+    , "0.0" -- height of geoid (mean sea level) above WGS84
+    , "M"   -- units for height
+    , ""    -- time in seconds since last DGPS update
+    , ""    -- DGPS station ID number
     ]
 
 latHemisphere :: Angle -> String
